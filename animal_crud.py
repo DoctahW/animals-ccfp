@@ -54,3 +54,57 @@ def removeranimal():
         return
     else:
         print("Opção inválida!")
+
+def editar_animal():
+    cur = conn.cursor()
+
+    print("\n-----O que deseja editar?-----")
+    print("1 - Nome")
+    print("2 - Idade")
+    print("3 - Raça")
+    print("4 - Especie")
+    print("5 - Estado de Saúde")
+    print("6 - Comportamento")
+    print("7 - Data de chegada")
+    esc = input("Escolha uma opção:")
+    nome_velho = ("Escreva o nome do animal editado:")
+
+    try:
+        if esc == "1":
+            novo_nome = input("Novo nome: ")
+            conn.execute("UPDATE animais SET nome = ? WHERE nome = ?", (novo_nome,nome_velho))
+
+        elif esc == "2":
+            nova_idade = int(input("Nova idade: "))
+            conn.execute("UPDATE pessoas SET idade = ? WHERE nome = ?", (nova_idade, nome_velho))
+
+        elif esc == "3":
+            nova_raca = input("Nova profissão: ")
+            conn.execute("UPDATE pessoas SET raca = ? WHERE nome = ?", (nova_raca, nome_velho))
+        
+        elif esc == "4":
+            nova_especie = input("Nova profissão: ")
+            conn.execute("UPDATE pessoas SET especie = ? WHERE nome = ?", (nova_especie, nome_velho))
+        
+        elif esc == "5":
+            nova_saude = input("Nova profissão: ")
+            conn.execute("UPDATE pessoas SET saude = ? WHERE nome = ?", (nova_saude, nome_velho))
+
+        elif esc == "6":
+            novo_comportamento = input("Nova profissão: ")
+            conn.execute("UPDATE pessoas SET comportamento = ? WHERE nome = ?", (novo_comportamento, nome_velho))
+        
+        elif esc == "7":
+            nova_data = input("Nova profissão: ")
+            conn.execute("UPDATE pessoas SET data = ? WHERE nome = ?", (nova_data, nome_velho))
+        
+        else:
+            print("Esta opção não é valida!")
+            return False
+        
+        conn.commit()
+        print("Animal atualizado com sucesso!")
+        return True
+    except ValueError:
+        print("ERRO: Idade deve ser um número!")
+        return False
