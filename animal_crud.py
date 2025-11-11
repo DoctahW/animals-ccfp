@@ -23,7 +23,7 @@ def adicionar_animal():
         print("ERRO: Idade deve ser um número!")
         return False
     
-def leranimais():
+def ler_animais():
     cur = conn.cursor()
     cur.execute("SELECT id,nome,idade,raca,especie,saude,comportamento,data FROM animais")
     animais = cur.fetchall()
@@ -33,8 +33,9 @@ def leranimais():
     print("\n=== ANIMAIS REGISTRADOS ===")
     for animal in animais:
         print(f"| ID: {animal[0]} | Nome: {animal[1]} | Idade: {animal[2]} | Raça: {animal[3]} | Especie: {animal[4]} | Saúde: {animal[5]} | Comportamento: {animal[6]} | Data: {animal[7]} |")
-def removeranimal():
-    leranimais()
+
+def remover_animais():
+    ler_animais()
     cur=conn.cursor()
     nome_busca= input("\nDigite o nome do animal que deseja remover: ")
 
