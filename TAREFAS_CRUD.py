@@ -2,7 +2,7 @@ import os
 os.system('cls')
 
 import sqlite3
-conn = sqlite3.connect("tarefas.db")
+conn = sqlite3.connect("amigo.db")
 
 def criar_tabela():
     cur = conn.cursor()
@@ -11,19 +11,17 @@ def criar_tabela():
 
 tarefas_dic = {1:"Banho",2:"Tosa",3:"Vacinação",4:"Check-Up",5:"Treinamento",6:"Castração"}
 
-file = open("tarefas.txt","w",encoding="utf-8")
-
 def adicionar_tarefas():
     pet_nome = input("Insira o nome do animal:  ")
     while True:
         try:
-            tarefa = int(input(f"Por favor, selecione as tarefas para {pet_nome}:\n[1] - Banho\n[2] - Tosa\n[3] - Vacinação\n[4] - Check-Up\n[5] - Treino\n[6] - Castração\n[0] - Sair"))
+            tarefa = int(input(f"Por favor, selecione as tarefas para {pet_nome}:\n[1] - Banho\n[2] - Tosa\n[3] - Vacinação\n[4] - Check-Up\n[5] - Treino\n[6] - Castração\n[0] - Sair\n[] = "))
             if tarefa == 0:
                 break
             elif tarefa >= 1 and tarefa <= 6:
-                data_prevista = int(input("Insira a data prevista para a tarefa: "))
-                responsavel = input("Nome do responsável pela tarefa: ")
-                conn.execute("INSERT INTO tarefas(nome,tarefa,data,responsavel) VALUES (?,?)",(pet_nome,tarefas_dic[tarefa],data_prevista,responsavel))
+                data_prevista = str(input("Insira a data prevista para a tarefa: "))
+                responsavel = str(input("Nome do responsável pela tarefa: "))
+                conn.execute("INSERT INTO tarefas(nome,tarefa,data,responsavel) VALUES (?,?,?,?)",(pet_nome,tarefas_dic[tarefa],data_prevista,responsavel))
                 conn.commit()
                 
                 print("Tarefa registrada com sucesso")
@@ -44,4 +42,7 @@ def ler_tarefas():
     print("\n=== TAREFAS AGENDADAS ===")
     for tarefa in tarefas:
         print(f"| ID: {tarefa[0]} | Nome: {tarefa[1]} | Tarefa: {tarefa[2]} | Data marcada: {tarefa[3]} | Responsável {tarefa[4]}") 
+
+criar_tabela()
+adicionar_tarefas()
         
