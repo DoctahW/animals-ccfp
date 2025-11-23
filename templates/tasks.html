@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Tarefas - Centro de Adoção{% endblock %}
+
+{% block content %}
+<!-- HEADER -->
+<div class="header">
+    <h1>Tarefas Agendadas</h1>
+    <button class="btn btn-primary" onclick="openModal('addTaskModal')">
+        ➕ Adicionar Tarefa
+    </button>
+</div>
+
+<!-- CONTENT AREA -->
+<div class="content-area" style="flex-direction: column; gap: 20px;">
+    <!-- FILTERS -->
+    <div style="display: flex; gap: 10px; padding: 0 30px;">
+        <div class="filters" style="margin-top: 0;">
+            <button class="filter-btn active" data-filter="all">Todas</button>
+            <button class="filter-btn" data-filter="Banho">🛁 Banho</button>
+            <button class="filter-btn" data-filter="Tosa">✂️ Tosa</button>
+            <button class="filter-btn" data-filter="Vacinação">💉 Vacinação</button>
+            <button class="filter-btn" data-filter="Check-Up">🏥 Check-Up</button>
+            <button class="filter-btn" data-filter="Treinamento">🎓 Treinamento</button>
+            <button class="filter-btn" data-filter="Castração">🔪 Castração</button>
+        </div>
+    </div>
+
+    <!-- TASKS LIST -->
+    <div style="padding: 0 30px; flex: 1; overflow-y: auto;">
+        <div id="tasksList">
+            {% for task in tasks %}
+            <div class="card" style="margin-bottom: 15px;" data-task-id="{{ task.id }}" data-tipo="{{ task.tarefa }}">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <span class="badge badge-warning" style="margin-top: 0;">{{ task.tarefa }}</span>
+                            <span style="font-weight: 600; color: #2c3e50;">{{ task.nome }}</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px;">
+                            <div>
+                                <div class="info-label">Data Prevista</div>
+                                <div class="info-value">{{ task.data }}</div>
+                            </div>
+                            <div>
+                                <div class="info-label">Responsável</div>
+                                <div class="info-value">{{ task.responsavel }}</div>
+                            </div>
+                            <div>
+                                <div class="info-label">Status</div>
+                                <span class="badge badge-process" style="margin-top: 0;">Pendente</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 5px; margin-left: 15px;">
+                        <button class="btn btn-sm btn-secondary" onclick="editTask({{ task.id }})">✏️</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteTask({{ task.id }})">🗑️</button>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <div class="empty-text">Nenhuma tarefa agendada</div>
+                <div class="empty-subtext">Clique em "Adicionar Tarefa" para criar uma nova</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Adicionar Tarefa -->
+<div id="addTaskModal" class="modal hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Adicionar Nova Tarefa</h2>
+            <button class="modal-close" onclick="closeModal('addTaskModal')">✕</button>
+        </div>
+        <form id="addTaskForm" class="modal-body">
+            <div class="form-group">
+                <label class="form-label">Selecione o Animal</label>
+                <select class="form-control" id="animalSelect" name="nome" required>
+                    <option value="">Carregando animais...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Tipo de Tarefa</label>
+                <select class="form-control" name="tarefa" required>
+                    <option value="">Selecione...</option>
+                    <option value="Banho">🛁 Banho</option>
+                    <option value="Tosa">✂️ Tosa</option>
+                    <option value="Vacinação">💉 Vacinação</option>
+                    <option value="Check-Up">🏥 Check-Up</option>
+                    <option value="Treinamento">🎓 Treinamento</option>
+                    <option value="Castração">🔪 Castração</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Data Prevista</label>
+                <input type="date" class="form-control" name="data" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Responsável</label>
+                <input type="text" class="form-control" name="responsavel" placeholder="Nome da pessoa responsável" required>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('addTaskModal')">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Adicionar Tarefa</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal overlay -->
+<div id="modalOverlay" class="modal-overlay hidden" onclick="closeAllModals()"></div>
+
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modal.css') }}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/tasks.js') }}"></script>
+<script src="{{ url_for('static', filename='js/modal.js') }}"></script>
+
+<script>
+/**
+ * Carrega lista de animais no dropdown quando o modal é aberto
+ */
+function carregarAnimaisNoDropdown() {
+    const select = document.getElementById('animalSelect');
+
+    fetch('/api/animals')
+        .then(response => response.json())
+        .then(animais => {
+            if (animais.length === 0) {
+                select.innerHTML = '<option value="">Nenhum animal cadastrado</option>';
+                select.disabled = true;
+            } else {
+                select.innerHTML = '<option value="">Selecione um animal...</option>';
+                animais.forEach(animal => {
+                    const option = document.createElement('option');
+                    option.value = animal.nome;
+                    option.textContent = `${animal.nome} (${animal.especie} - ${animal.raca})`;
+                    select.appendChild(option);
+                });
+                select.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar animais:', error);
+            select.innerHTML = '<option value="">Erro ao carregar animais</option>';
+            select.disabled = true;
+        });
+}
+
+// Interceptar abertura do modal de adicionar tarefa
+const addTaskBtn = document.querySelector('button[onclick="openModal(\'addTaskModal\')"]');
+if (addTaskBtn) {
+    addTaskBtn.addEventListener('click', function() {
+        setTimeout(carregarAnimaisNoDropdown, 100);
+    });
+}
+
+// Carregar animais também quando a página carrega (para caso de reload)
+document.addEventListener('DOMContentLoaded', function() {
+    carregarAnimaisNoDropdown();
+});
+</script>
+{% endblock %}

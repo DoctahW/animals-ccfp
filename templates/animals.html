@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}Animais - Centro de Adoção{% endblock %}
+
+{% block content %}
+<!-- HEADER -->
+<div class="header">
+    <h1>Gestão de Animais</h1>
+    <button class="btn btn-primary" onclick="openModal('addAnimalModal')">
+        ➕ Adicionar Animal
+    </button>
+</div>
+
+<!-- CONTENT AREA -->
+<div class="content-area">
+    <!-- ANIMAL LIST -->
+    <div class="animal-list">
+        <div class="list-header">
+            <h2>Lista de Animais</h2>
+            <input
+                type="text"
+                class="search-box"
+                id="searchAnimals"
+                placeholder="🔍 Buscar por nome, raça..."
+            >
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">Todos</button>
+                <button class="filter-btn" data-filter="dog">🐕 Cães</button>
+                <button class="filter-btn" data-filter="cat">🐱 Gatos</button>
+                <button class="filter-btn" data-filter="available">✓ Disponíveis</button>
+            </div>
+        </div>
+
+        <div id="animalList">
+            {% for animal in animals %}
+            <div class="animal-card" data-animal-id="{{ animal.id }}" data-especie="{{ animal.especie.lower() }}" onclick="carregarDetalhesAnimal({{ animal.id }})">
+                <div class="animal-card-header">
+                    <div
+                        class="animal-photo"
+                        style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"
+                    ></div>
+                    <div class="animal-info">
+                        <div class="animal-name">{{ animal.nome }}</div>
+                        <div class="animal-details">{{ animal.raca }} • {{ animal.idade }} {% if animal.idade == 1 %}ano{% else %}anos{% endif %}</div>
+                        <div class="animal-details">{{ animal.especie }}</div>
+                    </div>
+                </div>
+                {% if animal.status == 'Em Processo' %}
+                <span class="badge badge-process">● Em Processo</span>
+                {% elif animal.status == 'Em Tratamento' %}
+                <span class="badge badge-treatment">● Em Tratamento</span>
+                {% else %}
+                <span class="badge badge-available">● Disponível</span>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">🐾</div>
+                <div class="empty-text">Nenhum animal cadastrado</div>
+                <div class="empty-subtext">Clique em "Adicionar Animal" para começar</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- DETAIL PANEL -->
+    <div class="detail-panel" id="detailPanel">
+        <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <div class="empty-text">Selecione um animal</div>
+            <div class="empty-subtext">Clique em um animal na lista para ver os detalhes</div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Adicionar Animal -->
+<div id="addAnimalModal" class="modal hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Adicionar Novo Animal</h2>
+            <button class="modal-close" onclick="closeModal('addAnimalModal')">✕</button>
+        </div>
+        <form id="addAnimalForm" class="modal-body">
+            <div class="form-group">
+                <label class="form-label">Nome do Animal</label>
+                <input type="text" class="form-control" name="nome" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Espécie</label>
+                <select class="form-control" name="especie" required>
+                    <option value="">Selecione...</option>
+                    <option value="Cachorro">Cachorro</option>
+                    <option value="Gato">Gato</option>
+                    <option value="Coelho">Coelho</option>
+                    <option value="Pássaro">Pássaro</option>
+                    <option value="Outro">Outro</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Raça</label>
+                <input type="text" class="form-control" name="raca" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Idade (anos)</label>
+                <input type="number" class="form-control" name="idade" min="0" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Estado de Saúde</label>
+                <input type="text" class="form-control" name="saude" placeholder="Ex: Saudável, Vacinado...">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Comportamento</label>
+                <textarea class="form-control" name="comportamento" rows="3" placeholder="Descrição do temperamento..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Data de Chegada</label>
+                <input type="date" class="form-control" name="data" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Status</label>
+                <select class="form-control" name="status" required>
+                    <option value="Disponível">Disponível</option>
+                    <option value="Em Processo">Em Processo</option>
+                    <option value="Em Tratamento">Em Tratamento</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('addAnimalModal')">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Adicionar Animal</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal para Editar Animal -->
+<div id="editAnimalModal" class="modal hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Editar Animal</h2>
+            <button class="modal-close" onclick="closeModal('editAnimalModal')">✕</button>
+        </div>
+        <form id="editAnimalForm" class="modal-body">
+            <input type="hidden" id="editAnimalId" name="animalId">
+            <div class="form-group">
+                <label class="form-label">Nome do Animal</label>
+                <input type="text" class="form-control" id="editNome" name="nome" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Espécie</label>
+                <select class="form-control" id="editEspecie" name="especie" required>
+                    <option value="">Selecione...</option>
+                    <option value="Cachorro">Cachorro</option>
+                    <option value="Gato">Gato</option>
+                    <option value="Coelho">Coelho</option>
+                    <option value="Pássaro">Pássaro</option>
+                    <option value="Outro">Outro</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Raça</label>
+                <input type="text" class="form-control" id="editRaca" name="raca" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Idade (anos)</label>
+                <input type="number" class="form-control" id="editIdade" name="idade" min="0" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Estado de Saúde</label>
+                <input type="text" class="form-control" id="editSaude" name="saude" placeholder="Ex: Saudável, Vacinado...">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Comportamento</label>
+                <textarea class="form-control" id="editComportamento" name="comportamento" rows="3" placeholder="Descrição do temperamento..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Data de Chegada</label>
+                <input type="date" class="form-control" id="editData" name="data" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Status</label>
+                <select class="form-control" id="editStatus" name="status" required>
+                    <option value="Disponível">Disponível</option>
+                    <option value="Em Processo">Em Processo</option>
+                    <option value="Em Tratamento">Em Tratamento</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('editAnimalModal')">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal overlay -->
+<div id="modalOverlay" class="modal-overlay hidden" onclick="closeAllModals()"></div>
+
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modal.css') }}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/animals.js') }}"></script>
+{% endblock %}

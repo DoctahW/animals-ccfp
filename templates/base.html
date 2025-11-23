@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Centro de Adoção - Sistema de Gestão{% endblock %}</title>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/variables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/details.css') }}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="container-main">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="logo">🐾 AdoptCenter</div>
+            <nav>
+                <div class="menu-item {% if page == 'dashboard' %}active{% endif %}" onclick="navigateTo('/')">
+                    <span class="menu-icon">🏠</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="menu-item {% if page == 'animals' %}active{% endif %}" onclick="navigateTo('/animals')">
+                    <span class="menu-icon">🐕</span>
+                    <span>Animais</span>
+                </div>
+                <div class="menu-item {% if page == 'tasks' %}active{% endif %}" onclick="navigateTo('/tasks')">
+                    <span class="menu-icon">📋</span>
+                    <span>Tarefas</span>
+                </div>
+                <div class="menu-item" onclick="navigateTo('/#')">
+                    <span class="menu-icon">👥</span>
+                    <span>Adotantes</span>
+                </div>
+                <div class="menu-item" onclick="navigateTo('/#')">
+                    <span class="menu-icon">📅</span>
+                    <span>Agenda</span>
+                </div>
+                <div class="menu-item" onclick="navigateTo('/#')">
+                    <span class="menu-icon">💰</span>
+                    <span>Doações</span>
+                </div>
+                <div class="menu-item" onclick="navigateTo('/#')">
+                    <span class="menu-icon">👨‍⚕️</span>
+                    <span>Veterinário</span>
+                </div>
+                <div class="menu-item" onclick="navigateTo('/#')">
+                    <span class="menu-icon">⚙️</span>
+                    <span>Configurações</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Base JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modal.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Página não encontrada - Centro de Adoção{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: linear-gradient(135deg, #ffeef8 0%, #fff5f7 100%);">
+    <div style="text-align: center;">
+        <div style="font-size: 120px; margin-bottom: 20px;">🐾</div>
+        <h1 style="font-size: 36px; color: #2c3e50; margin-bottom: 10px;">Página não encontrada</h1>
+        <p style="font-size: 18px; color: #7f8c8d; margin-bottom: 30px;">O animal que você procura não existe.</p>
+        <a href="/animals" class="btn btn-primary" style="display: inline-block;">← Voltar para Animais</a>
+    </div>
+</div>
+{% endblock %}
