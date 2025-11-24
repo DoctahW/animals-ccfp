@@ -614,7 +614,7 @@ function carregarAnimaisNoDropdown() {
                 select.innerHTML = '<option value="">Selecione um animal...</option>';
                 animais.forEach(animal => {
                     const option = document.createElement('option');
-                    option.value = animal.nome;
+                    option.value = animal.id;
                     option.textContent = `${animal.nome} (${animal.especie} - ${animal.raca})`;
                     select.appendChild(option);
                 });
