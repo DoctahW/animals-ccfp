@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from datetime import datetime, timedelta
+from datetime import datetime
 from animal_crud import (
     criar_tabela as criar_tabela_animais,
     ler_animais,
