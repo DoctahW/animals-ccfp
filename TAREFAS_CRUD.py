@@ -150,5 +150,3 @@ def contar_tarefas_animal(nome_animal):
     count = cur.fetchone()[0]
     conn.close()
     return count
-
-adicionar_tarefas()
