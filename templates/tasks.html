@@ -3,13 +3,13 @@
 {% block title %}Tarefas - Centro de Adoção{% endblock %}
 
 {% block content %}
-<!-- HEADER -->
-<div class="header">
-    <h1>Tarefas Agendadas</h1>
-    <button class="btn btn-primary" onclick="openModal('addTaskModal')">
-        ➕ Adicionar Tarefa
-    </button>
-</div>
+<!-- Botão Flutuante -->
+<button class="btn-floating-add" onclick="openModal('addTaskModal')">
+    <span class="btn-text">Adicionar Tarefa</span>
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M7 0C3.13 0 0 3.13 0 7C0 10.87 3.13 14 7 14C10.87 14 14 10.87 14 7C14 3.13 10.87 0 7 0ZM10.5 7.5H7.5V10.5H6.5V7.5H3.5V6.5H6.5V3.5H7.5V6.5H10.5V7.5Z" fill="white"/>
+    </svg>
+</button>
 
 <!-- CONTENT AREA -->
 <div class="content-area" style="flex-direction: column; gap: 20px;">
