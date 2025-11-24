@@ -11,7 +11,7 @@ html {
 
 body {
     font-family: var(--font-family);
-    background: var(--gradient-bg);
+    background: #E9ECF2;
     min-height: 100vh;
     color: var(--text-dark);
 }

@@ -79,7 +79,7 @@
         <form id="addTaskForm" class="modal-body">
             <div class="form-group">
                 <label class="form-label">Selecione o Animal</label>
-                <select class="form-control" id="animalSelect" name="nome" required>
+                <select class="form-control" id="animalSelect" name="animal_id" required>
                     <option value="">Carregando animais...</option>
                 </select>
             </div>
@@ -141,7 +141,7 @@ function carregarAnimaisNoDropdown() {
                 select.innerHTML = '<option value="">Selecione um animal...</option>';
                 animais.forEach(animal => {
                     const option = document.createElement('option');
-                    option.value = animal.nome;
+                    option.value = animal.id;
                     option.textContent = `${animal.nome} (${animal.especie} - ${animal.raca})`;
                     select.appendChild(option);
                 });

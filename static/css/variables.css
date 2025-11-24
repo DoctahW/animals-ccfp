@@ -1,7 +1,7 @@
 /* CSS Variables - Design System */
 :root {
     /* Colors */
-    --primary-color: #3498db;
+    --primary-color: #707fdd;
     --primary-dark: #2980b9;
     --secondary-color: #2c3e50;
     --light-bg: #f8f9fa;
@@ -13,14 +13,7 @@
     --warning-color: #f39c12;
     --danger-color: #e74c3c;
     --info-color: #3498db;
-
-    /* Gradients */
-    --gradient-blue: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --gradient-pink: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    --gradient-yellow: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-    --gradient-cyan: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-    --gradient-bg: linear-gradient(135deg, #ffeef8 0%, #fff5f7 100%);
-
+    
     /* Typography */
     --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     --font-size-base: 15px;

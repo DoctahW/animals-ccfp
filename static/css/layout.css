@@ -159,7 +159,7 @@
 .stats-container {
     display: flex;
     gap: var(--spacing-lg);
-    padding: var(--spacing-lg) var(--spacing-xl);
+    padding: var(--spacing-lg) var(--spacing-xl) 0px;
     flex-shrink: 0;
 }
 
@@ -205,6 +205,6 @@
     display: flex;
     flex: 1;
     gap: var(--spacing-lg);
-    padding: var(--spacing-xl);
+    padding: var(--spacing-xl) ;
     overflow: hidden;
 }

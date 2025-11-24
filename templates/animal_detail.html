@@ -64,7 +64,14 @@
 
         <!-- PRÓXIMAS TAREFAS E VACINAÇÕES -->
         <div class="card" style="margin-top: 20px;">
-            <div class="section-title">📋 Próximas Tarefas e Vacinações</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div class="section-title" style="margin: 0;">📋 Próximas Tarefas e Vacinações</div>
+                <button class="btn-add-task-icon" onclick="abrirModalTarefaComAnimal({{ animal.id }}, '{{ animal.nome }}')" title="Adicionar tarefa">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM14 11H11V14C11 14.55 10.55 15 10 15C9.45 15 9 14.55 9 14V11H6C5.45 11 5 10.55 5 10C5 9.45 5.45 9 6 9H9V6C9 5.45 9.45 5 10 5C10.55 5 11 5.45 11 6V9H14C14.55 9 15 9.45 15 10C15 10.55 14.55 11 14 11Z" fill="#707FDD"/>
+                    </svg>
+                </button>
+            </div>
             <div id="proximasTarefasContainer" style="min-height: 200px;">
                 <div style="text-align: center; padding: 40px 20px; color: #999;">
                     <div style="font-size: 24px; margin-bottom: 10px;">⏳</div>
@@ -224,6 +231,32 @@
         font-size: 32px;
         margin-bottom: 10px;
     }
+
+    .btn-add-task-icon {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        border-radius: 8px;
+    }
+
+    .btn-add-task-icon:hover {
+        background: rgba(112, 127, 221, 0.1);
+        transform: scale(1.1);
+    }
+
+    .btn-add-task-icon:active {
+        transform: scale(0.95);
+    }
+
+    .btn-add-task-icon svg {
+        width: 25px;
+        height: 25px;
+    }
 </style>
 {% endblock %}
 
@@ -248,17 +281,7 @@ function carregarProximasTarefas(animalId) {
             } else {
                 let html = '';
                 tarefas.forEach(tarefa => {
-                    const iconMap = {
-                        'Vacinação': '💉',
-                        'Vacinacao': '💉',
-                        'Banho': '🛁',
-                        'Tosa': '✂️',
-                        'Check-Up': '🩺',
-                        'Treinamento': '📚',
-                        'Castração': '🔧',
-                        'Castracao': '🔧'
-                    };
-                    const icon = iconMap[tarefa.tarefa] || '📌';
+                    const icon = obterIconeTarefa(tarefa.tarefa);
                     const urgentClass = tarefa.contagem.urgente ? 'urgente' : '';
 
                     let badgeClass = 'badge-ok';

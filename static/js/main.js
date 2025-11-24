@@ -122,11 +122,12 @@ function attachAnimalCardListeners() {
 
             const animalId = this.getAttribute('data-animal-id');
             if (animalId) {
-                loadAnimalDetails(animalId);
+                carregarDetalhesAnimal(animalId);
             }
         });
     });
 }
+
 
 /**
  * Carrega detalhes do animal no painel lateral
@@ -134,12 +135,6 @@ function attachAnimalCardListeners() {
  */
 async function carregarDetalhesAnimal(animalId) {
     try {
-        // Marcar card como selecionado
-        document.querySelectorAll('.animal-card').forEach(card => {
-            card.classList.remove('selected');
-        });
-        document.querySelector(`[data-animal-id="${animalId}"]`).classList.add('selected');
-
         // Buscar dados do animal
         const response = await fetch(`/api/animals/${animalId}`);
         if (!response.ok) throw new Error('Animal não encontrado');
@@ -208,8 +203,10 @@ async function carregarDetalhesAnimal(animalId) {
                 <div class="detail-section">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                         <div class="section-title" style="margin: 0;">📋 Próximas Tarefas e Vacinações</div>
-                        <button class="btn btn-sm btn-primary" onclick="abrirModalTarefaComAnimal(${animal.id}, '${animal.nome}')">
-                            ➕ Adicionar
+                        <button class="btn-add-task-icon" onclick="abrirModalTarefaComAnimal(${animal.id}, '${animal.nome}')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none">
+                                <path d="M12.5 0C5.6 0 0 5.6 0 12.5C0 19.4 5.6 25 12.5 25C19.4 25 25 19.4 25 12.5C25 5.6 19.4 0 12.5 0ZM17.5 13.75H13.75V17.5C13.75 18.1875 13.1875 18.75 12.5 18.75C11.8125 18.75 11.25 18.1875 11.25 17.5V13.75H7.5C6.8125 13.75 6.25 13.1875 6.25 12.5C6.25 11.8125 6.8125 11.25 7.5 11.25H11.25V7.5C11.25 6.8125 11.8125 6.25 12.5 6.25C13.1875 6.25 13.75 6.8125 13.75 7.5V11.25H17.5C18.1875 11.25 18.75 11.8125 18.75 12.5C18.75 13.1875 18.1875 13.75 17.5 13.75Z" fill="#707FDD"/>
+                            </svg>
                         </button>
                     </div>
                     <div id="proximasTarefasDetailPanel" style="min-height: 150px;">
@@ -252,6 +249,7 @@ async function carregarDetalhesAnimal(animalId) {
 
 /**
  * Carrega próximas tarefas do animal no detail panel
+ * Usa constante TAREFA_ICON_MAP compartilhada
  * @param {number} animalId - ID do animal
  */
 function carregarProximasTarefasDetail(animalId) {
@@ -271,26 +269,14 @@ function carregarProximasTarefasDetail(animalId) {
             } else {
                 let html = '';
                 tarefas.forEach(tarefa => {
-                    const iconMap = {
-                        'Vacinação': '💉',
-                        'Vacinacao': '💉',
-                        'Banho': '🛁',
-                        'Tosa': '✂️',
-                        'Check-Up': '🩺',
-                        'Treinamento': '📚',
-                        'Castração': '🔧',
-                        'Castracao': '🔧'
-                    };
-                    const icon = iconMap[tarefa.tarefa] || '📌';
+                    // Usar constante compartilhada ao invés de duplicar iconMap
+                    const icon = obterIconeTarefa(tarefa.tarefa);
                     const urgentClass = tarefa.contagem.urgente ? 'style="background: #fff3cd; border-left-color: #ffc107;"' : '';
 
-                    let badgeClass = 'badge-ok';
                     let badgeStyle = 'background: #d1ecf1; color: #0c5460;';
                     if (tarefa.contagem.status === 'urgente' || tarefa.contagem.status === 'atrasado' || tarefa.contagem.status === 'hoje') {
-                        badgeClass = 'badge-urgent';
                         badgeStyle = 'background: #f8d7da; color: #721c24;';
                     } else if (tarefa.contagem.status === 'proximo') {
-                        badgeClass = 'badge-soon';
                         badgeStyle = 'background: #d4edda; color: #155724;';
                     }
 
@@ -661,11 +647,11 @@ function abrirModalTarefaComAnimal(animalId, animalNome) {
                 carregarAnimaisNoDropdown();
                 // Aguardar carregamento
                 setTimeout(function() {
-                    select.value = animalNome;
+                    select.value = animalId;
                 }, 100);
             } else {
                 // Já está carregado, apenas selecionar
-                select.value = animalNome;
+                select.value = animalId;
             }
         }
     }, 50);
