@@ -11,6 +11,7 @@ from animal_crud import (
 from TAREFAS_CRUD import (
     criar_tabela as criar_tabela_tarefas,
     ler_tarefas,
+    ler_tarefas_por_animal,
     adicionar_tarefas,
     remover_tarefa,
     editar_tarefa,
@@ -87,48 +88,56 @@ def calcular_dias_ate_tarefa(data_tarefa_str):
 
 def obter_proximas_tarefas(animal_id=None):
     try:
-        todas_tarefas = ler_tarefas()
-        
+        # Definir quais tarefas buscar
         if animal_id:
-            animal = ler_animal_id(animal_id)
-            
-            if animal:
-                tarefas = []
-                for tarefa in todas_tarefas:
-                    if tarefa.get('nome') == animal.get('nome'):
-                        tarefas.append(tarefa)
-            else:
-                tarefas = []
+            tarefas = ler_tarefas_por_animal(animal_id)
         else:
-            tarefas = todas_tarefas
-        
+            tarefas = ler_tarefas()
+
+        # Adicionar contagem regressiva em cada tarefa
         tarefas_com_contagem = []
-        
+
         for tarefa in tarefas:
             contagem = calcular_dias_ate_tarefa(tarefa.get('data', ''))
-            
+
+            # Copiar tarefa e adicionar contagem
             tarefa_completa = tarefa.copy()
-            
             tarefa_completa['contagem'] = contagem
-            
+
             tarefas_com_contagem.append(tarefa_completa)
-        
-        def extrair_dias_para_ordenar(tarefa):
-            """Função auxiliar para ordenação"""
-            dias = tarefa['contagem']['dias']
-            
-            if type(dias) == int:
-                return dias
-            else:
-                return 999
-        
-        tarefas_com_contagem.sort(key=extrair_dias_para_ordenar)
-        
+
+        # Ordenar tarefas por urgência
+        tarefas_com_contagem = ordenar_tarefas_por_urgencia(tarefas_com_contagem)
+
         return tarefas_com_contagem
-        
+
     except Exception as e:
-        print(f"Erro ao obter próximas tarefas: {e}")
+        mensagem_erro = f"Erro ao obter próximas tarefas: {e}"
+        print(mensagem_erro)
         return []
+
+
+def ordenar_tarefas_por_urgencia(tarefas):
+    tarefas_ordenadas = []
+
+    tarefas_copia = tarefas.copy()
+
+    for tarefa in tarefas_copia:
+        dias = tarefa['contagem']['dias']
+
+        if isinstance(dias, int):
+            numero_dias = dias
+        else:
+            numero_dias = 999
+
+        tarefa['dias_numericos'] = numero_dias
+
+    def obter_dias_numericos(tarefa):
+        return tarefa['dias_numericos']
+
+    tarefas_ordenadas = sorted(tarefas_copia, key=obter_dias_numericos)
+
+    return tarefas_ordenadas
 
 
 def get_dashboard_stats():
@@ -296,20 +305,20 @@ def api_add_animal():
 def api_delete_animal(animal_id):
     try:
         animal = ler_animal_id(animal_id)
+
         if not animal:
             return jsonify({'error': 'Animal não encontrado'}), 404
 
-        print(f"[DEBUG] Deletando animal: ID={animal_id}, Nome='{animal['nome']}'")
-
-        remover_tarefas_por_animal(animal['nome'])
+        remover_tarefas_por_animal(animal_id)
 
         remover_animal(animal_id)
 
-        print(f"[DEBUG] Animal {animal_id} deletado com sucesso!")
-        return jsonify({'success': f'Animal e suas tarefas removidos com sucesso'}), 200
+        mensagem_sucesso = f'Animal {animal["nome"]} e suas tarefas foram removidos com sucesso'
+        return jsonify({'success': mensagem_sucesso}), 200
+
     except Exception as e:
-        print(f"[ERRO] api_delete_animal: {e}")
-        return jsonify({'error': str(e)}), 500
+        mensagem_erro = f'Erro ao deletar animal: {str(e)}'
+        return jsonify({'error': mensagem_erro}), 500
 
 
 @app.route('/api/animals/<int:animal_id>', methods=['PUT'])
@@ -363,45 +372,52 @@ def api_get_task(task_id):
 @app.route('/api/tasks/add', methods=['POST'])
 def api_add_task():
     try:
+        json_data = request.get_json()
 
-        data = request.get_json()
-        
-        campos_obrigatorios = ['nome', 'tarefa', 'data', 'responsavel']
-        todos_campos_presentes = True
+        campos_obrigatorios = ['animal_id', 'tarefa', 'data', 'responsavel']
+        campos_faltando = []
+
         for campo in campos_obrigatorios:
-            if campo not in data:
-                todos_campos_presentes = False
-                break
-        if not todos_campos_presentes:
-            return jsonify({'error': 'Campos obrigatórios faltando'}), 400
+            if campo not in json_data:
+                campos_faltando.append(campo)
 
+        if campos_faltando:
+            mensagem_erro = f'Campos obrigatórios faltando: {", ".join(campos_faltando)}'
+            return jsonify({'error': mensagem_erro}), 400
 
         tipos_validos = ["Banho", "Tosa", "Vacinação", "Check-Up", "Treinamento", "Castração"]
-        
-        tipo_recebido = data.get('tarefa')
-        
-        tipo_eh_valido = False
-        for tipo in tipos_validos:
-            if tipo_recebido == tipo:
-                tipo_eh_valido = True
-                break
-        
+        tipo_tarefa = json_data.get('tarefa')
+
+        tipo_eh_valido = tipo_tarefa in tipos_validos
+
         if not tipo_eh_valido:
             tipos_formatados = ", ".join(tipos_validos)
             mensagem_erro = f'Tipo de tarefa inválido. Válidos: {tipos_formatados}'
             return jsonify({'error': mensagem_erro}), 400
-        
+
+        animal_id = json_data.get('animal_id')
+        animal = ler_animal_id(animal_id)
+
+        if not animal:
+            mensagem_erro = f'Animal com ID {animal_id} não encontrado'
+            return jsonify({'error': mensagem_erro}), 404
+
+        nome_animal = animal.get('nome')
+
         adicionar_tarefas(
-            data.get('nome'),
-            data.get('tarefa'),
-            data.get('data'),
-            data.get('responsavel')
+            animal_id=animal_id,
+            tarefa=tipo_tarefa,
+            data=json_data.get('data'),
+            responsavel=json_data.get('responsavel'),
+            nome=nome_animal
         )
-        
-        return jsonify({'success': 'Tarefa adicionada com sucesso'}), 201
-        
+
+        mensagem_sucesso = f'Tarefa adicionada com sucesso para {nome_animal}'
+        return jsonify({'success': mensagem_sucesso}), 201
+
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        mensagem_erro = f'Erro ao adicionar tarefa: {str(e)}'
+        return jsonify({'error': mensagem_erro}), 500
 
 
 @app.route('/api/tasks/<int:task_id>', methods=['DELETE'])
@@ -421,23 +437,49 @@ def api_delete_task(task_id):
 @app.route('/api/tasks/<int:task_id>', methods=['PUT'])
 def api_edit_task(task_id):
     try:
-        task = ler_tarefa_id(task_id)
-        if not task:
+        tarefa_atual = ler_tarefa_id(task_id)
+
+        if not tarefa_atual:
             return jsonify({'error': 'Tarefa não encontrada'}), 404
 
-        data = request.get_json()
+        json_data = request.get_json()
 
-        nome = data.get('nome', task['nome'])
-        tarefa = data.get('tarefa', task['tarefa'])
-        data_tarefa = data.get('data', task['data'])
-        responsavel = data.get('responsavel', task['responsavel'])
+        animal_id = json_data.get('animal_id', tarefa_atual.get('animal_id'))
+        tipo_tarefa = json_data.get('tarefa', tarefa_atual.get('tarefa'))
+        data_tarefa = json_data.get('data', tarefa_atual.get('data'))
+        responsavel = json_data.get('responsavel', tarefa_atual.get('responsavel'))
+        nome_animal = json_data.get('nome', tarefa_atual.get('nome'))
 
-        editar_tarefa(task_id, nome, tarefa, data_tarefa, responsavel)
+        tipos_validos = ["Banho", "Tosa", "Vacinação", "Check-Up", "Treinamento", "Castração"]
+
+        if tipo_tarefa not in tipos_validos:
+            tipos_formatados = ", ".join(tipos_validos)
+            mensagem_erro = f'Tipo de tarefa inválido. Válidos: {tipos_formatados}'
+            return jsonify({'error': mensagem_erro}), 400
+
+        if animal_id != tarefa_atual.get('animal_id'):
+            animal = ler_animal_id(animal_id)
+
+            if not animal:
+                mensagem_erro = f'Animal com ID {animal_id} não encontrado'
+                return jsonify({'error': mensagem_erro}), 404
+
+            nome_animal = animal.get('nome')
+
+        editar_tarefa(
+            task_id,
+            animal_id,
+            tipo_tarefa,
+            data_tarefa,
+            responsavel,
+            nome_animal
+        )
 
         return jsonify({'success': 'Tarefa atualizada com sucesso'}), 200
 
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        mensagem_erro = f'Erro ao editar tarefa: {str(e)}'
+        return jsonify({'error': mensagem_erro}), 500
 
 
 @app.route('/api/stats', methods=['GET'])
@@ -463,13 +505,21 @@ def api_proximas_tarefas():
 def api_contar_tarefas_animal(animal_id):
     try:
         animal = ler_animal_id(animal_id)
+
         if not animal:
             return jsonify({'error': 'Animal não encontrado'}), 404
 
-        count = contar_tarefas_animal(animal['nome'])
-        return jsonify({'count': count, 'nome': animal['nome']}), 200
+        quantidade_tarefas = contar_tarefas_animal(animal_id)
+
+        return jsonify({
+            'count': quantidade_tarefas,
+            'animal_id': animal_id,
+            'nome': animal['nome']
+        }), 200
+
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        mensagem_erro = f'Erro ao contar tarefas: {str(e)}'
+        return jsonify({'error': mensagem_erro}), 500
 
 
 # ==================== ERRO HANDLERS ====================
