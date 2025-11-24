@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Centro de Adoção{% endblock %}
+
+{% block content %}
+<!-- Botão Flutuante -->
+<button class="btn-floating-add" onclick="openModal('addAnimalModal')">
+    <span class="btn-text">Adicionar Animal</span>
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M7 0C3.13 0 0 3.13 0 7C0 10.87 3.13 14 7 14C10.87 14 14 10.87 14 7C14 3.13 10.87 0 7 0ZM10.5 7.5H7.5V10.5H6.5V7.5H3.5V6.5H6.5V3.5H7.5V6.5H10.5V7.5Z" fill="white"/>
+    </svg>
+</button>
+
+<!-- STATS CARDS -->
+<div class="stats-container">
+    <div class="stat-card blue">
+        <div class="stat-label">Total de Animais</div>
+        <div class="stat-number" id="totalAnimals">{{ total_animals }}</div>
+    </div>
+    <div class="stat-card yellow">
+        <div class="stat-label">Tarefas Pendentes</div>
+        <div class="stat-number" id="pendingTasks">{{ pending_tasks }}</div>
+    </div>
+    <div class="stat-card red">
+        <div class="stat-label">Tarefas Urgentes</div>
+        <div class="stat-number" id="urgentTasks">{{ urgent_tasks }}</div>
+    </div>
+</div>
+
+<!-- CONTENT AREA -->
+<div class="content-area">
+    <!-- ANIMAL LIST -->
+    <div class="animal-list">
+        <div class="list-header">
+            <h2>Lista de Animais</h2>
+            <input
+                type="text"
+                class="search-box"
+                id="searchAnimals"
+                placeholder="🔍 Buscar por nome, raça..."
+            >
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">Todos</button>
+                <button class="filter-btn" data-filter="dog">🐕 Cães</button>
+                <button class="filter-btn" data-filter="cat">🐱 Gatos</button>
+                <button class="filter-btn" data-filter="available">✓ Disponíveis</button>
+            </div>
+        </div>
+
+        <div id="animalList">
+            {% for animal in animals %}
+            <div class="animal-card" data-animal-id="{{ animal.id }}" data-especie="{{ animal.especie.lower() }}" onclick="carregarDetalhesAnimal({{ animal.id }})">
+                <div class="animal-card-header">
+                    <div
+                        class="animal-photo"
+                        style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"
+                    ></div>
+                    <div class="animal-info">
+                        <div class="animal-name">{{ animal.nome }}</div>
+                        <div class="animal-details">{{ animal.raca }} • {{ animal.idade }} {% if animal.idade == 1 %}ano{% else %}anos{% endif %}</div>
+                        <div class="animal-details">{{ animal.especie }}</div>
+                    </div>
+                </div>
+                {% if animal.status == 'Em Processo' %}
+                <span class="badge badge-process">● Em Processo</span>
+                {% elif animal.status == 'Em Tratamento' %}
+                <span class="badge badge-treatment">● Em Tratamento</span>
+                {% else %}
+                <span class="badge badge-available">● Disponível</span>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">🐾</div>
+                <div class="empty-text">Nenhum animal cadastrado</div>
+                <div class="empty-subtext">Clique em "Adicionar Animal" para começar</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- DETAIL PANEL -->
+    <div class="detail-panel" id="detailPanel">
+        <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <div class="empty-text">Selecione um animal</div>
+            <div class="empty-subtext">Clique em um animal na lista para ver os detalhes</div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Adicionar Animal -->
+<div id="addAnimalModal" class="modal hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Adicionar Novo Animal</h2>
+            <button class="modal-close" onclick="closeModal('addAnimalModal')">✕</button>
+        </div>
+        <form id="addAnimalForm" class="modal-body">
+            <div class="form-group">
+                <label class="form-label">Nome do Animal</label>
+                <input type="text" class="form-control" name="nome" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Espécie</label>
+                <select class="form-control" name="especie" required>
+                    <option value="">Selecione...</option>
+                    <option value="Cachorro">Cachorro</option>
+                    <option value="Gato">Gato</option>
+                    <option value="Coelho">Coelho</option>
+                    <option value="Pássaro">Pássaro</option>
+                    <option value="Outro">Outro</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Raça</label>
+                <input type="text" class="form-control" name="raca" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Idade (anos)</label>
+                <input type="number" class="form-control" name="idade" min="0" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Estado de Saúde</label>
+                <input type="text" class="form-control" name="saude" placeholder="Ex: Saudável, Vacinado...">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Comportamento</label>
+                <textarea class="form-control" name="comportamento" rows="3" placeholder="Descrição do temperamento..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Data de Chegada</label>
+                <input type="date" class="form-control" name="data" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Status</label>
+                <select class="form-control" name="status" required>
+                    <option value="Disponível">Disponível</option>
+                    <option value="Em Processo">Em Processo</option>
+                    <option value="Em Tratamento">Em Tratamento</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('addAnimalModal')">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Adicionar Animal</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal para Editar Animal -->
+<div id="editAnimalModal" class="modal hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Editar Animal</h2>
+            <button class="modal-close" onclick="closeModal('editAnimalModal')">✕</button>
+        </div>
+        <form id="editAnimalForm" class="modal-body">
+            <input type="hidden" id="editAnimalId" name="animalId">
+            <div class="form-group">
+                <label class="form-label">Nome do Animal</label>
+                <input type="text" class="form-control" id="editNome" name="nome" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Espécie</label>
+                <select class="form-control" id="editEspecie" name="especie" required>
+                    <option value="">Selecione...</option>
+                    <option value="Cachorro">Cachorro</option>
+                    <option value="Gato">Gato</option>
+                    <option value="Coelho">Coelho</option>
+                    <option value="Pássaro">Pássaro</option>
+                    <option value="Outro">Outro</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Raça</label>
+                <input type="text" class="form-control" id="editRaca" name="raca" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Idade (anos)</label>
+                <input type="number" class="form-control" id="editIdade" name="idade" min="0" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Estado de Saúde</label>
+                <input type="text" class="form-control" id="editSaude" name="saude" placeholder="Ex: Saudável, Vacinado...">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Comportamento</label>
+                <textarea class="form-control" id="editComportamento" name="comportamento" rows="3" placeholder="Descrição do temperamento..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Data de Chegada</label>
+                <input type="date" class="form-control" id="editData" name="data" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Status</label>
+                <select class="form-control" id="editStatus" name="status" required>
+                    <option value="Disponível">Disponível</option>
+                    <option value="Em Processo">Em Processo</option>
+                    <option value="Em Tratamento">Em Tratamento</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('editAnimalModal')">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal para Adicionar Tarefa -->
+<div id="addTaskModal" class="modal hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Adicionar Nova Tarefa</h2>
+            <button class="modal-close" onclick="closeModal('addTaskModal')">✕</button>
+        </div>
+        <form id="addTaskForm" class="modal-body">
+            <div class="form-group">
+                <label class="form-label">Selecione o Animal</label>
+                <select class="form-control" id="animalSelect" name="nome" required>
+                    <option value="">Carregando animais...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Tipo de Tarefa</label>
+                <select class="form-control" name="tarefa" required>
+                    <option value="">Selecione...</option>
+                    <option value="Banho">🛁 Banho</option>
+                    <option value="Tosa">✂️ Tosa</option>
+                    <option value="Vacinação">💉 Vacinação</option>
+                    <option value="Check-Up">🏥 Check-Up</option>
+                    <option value="Treinamento">🎓 Treinamento</option>
+                    <option value="Castração">🔪 Castração</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Data Prevista</label>
+                <input type="date" class="form-control" name="data" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Responsável</label>
+                <input type="text" class="form-control" name="responsavel" placeholder="Nome da pessoa responsável" required>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('addTaskModal')">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Adicionar Tarefa</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal overlay -->
+<div id="modalOverlay" class="modal-overlay hidden" onclick="closeAllModals()"></div>
+
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modal.css') }}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

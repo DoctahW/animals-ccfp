@@ -1,0 +1,424 @@
+{% extends "base.html" %}
+
+{% block title %}Detalhes - {{ animal.nome }} - Centro de Adoção{% endblock %}
+
+{% block content %}
+<!-- HEADER -->
+<div class="header">
+    <h1>{{ animal.nome }}</h1>
+    <div class="action-buttons">
+        <button class="btn btn-secondary" onclick="editarAnimal({{ animal.id }})">✏️ Editar</button>
+        <button class="btn btn-danger" onclick="deletarAnimal({{ animal.id }})">🗑️ Remover</button>
+    </div>
+</div>
+
+<!-- CONTENT AREA -->
+<div style="padding: 30px; overflow-y: auto; flex: 1;">
+    <div style="max-width: 1000px; margin: 0 auto;">
+
+        <!-- ID e Data de Chegada -->
+        <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <div class="info-label">ID</div>
+                    <div class="info-value">#{{ animal.id }}</div>
+                </div>
+                <div>
+                    <div class="info-label">Data de Chegada</div>
+                    <div class="info-value">{{ animal.data }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INFORMAÇÕES BÁSICAS -->
+        <div class="card">
+            <div class="section-title">📝 Informações Básicas</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Espécie</div>
+                    <div class="info-value">{{ animal.especie }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Raça</div>
+                    <div class="info-value">{{ animal.raca }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Idade</div>
+                    <div class="info-value">{{ animal.idade }} {% if animal.idade == 1 %}ano{% else %}anos{% endif %}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Status</div>
+                    <span class="badge badge-available" style="margin-top: 0;">● Disponível</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SAÚDE -->
+        <div class="card" style="margin-top: 20px;">
+            <div class="section-title">💉 Saúde</div>
+            <div class="info-item">
+                <div class="info-label">Estado de Saúde</div>
+                <div class="info-value">{{ animal.saude if animal.saude else 'Sem informações' }}</div>
+            </div>
+        </div>
+
+        <!-- PRÓXIMAS TAREFAS E VACINAÇÕES -->
+        <div class="card" style="margin-top: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div class="section-title" style="margin: 0;">📋 Próximas Tarefas e Vacinações</div>
+                <button class="btn-add-task-icon" onclick="abrirModalTarefaComAnimal({{ animal.id }}, '{{ animal.nome }}')" title="Adicionar tarefa">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM14 11H11V14C11 14.55 10.55 15 10 15C9.45 15 9 14.55 9 14V11H6C5.45 11 5 10.55 5 10C5 9.45 5.45 9 6 9H9V6C9 5.45 9.45 5 10 5C10.55 5 11 5.45 11 6V9H14C14.55 9 15 9.45 15 10C15 10.55 14.55 11 14 11Z" fill="#707FDD"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="proximasTarefasContainer" style="min-height: 200px;">
+                <div style="text-align: center; padding: 40px 20px; color: #999;">
+                    <div style="font-size: 24px; margin-bottom: 10px;">⏳</div>
+                    <div>Carregando tarefas...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMPORTAMENTO -->
+        <div class="card" style="margin-top: 20px;">
+            <div class="section-title">🎭 Comportamento</div>
+            <div class="info-item">
+                <div class="info-label">Descrição</div>
+                <div class="info-value" style="line-height: 1.6;">
+                    {{ animal.comportamento if animal.comportamento else 'Sem informações' }}
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTÕES DE AÇÃO -->
+        <div style="margin-top: 30px; display: flex; gap: 10px;">
+            <button class="btn btn-primary" onclick="window.history.back()">← Voltar</button>
+            <button class="btn btn-secondary" onclick="editarAnimal({{ animal.id }})">✏️ Editar Informações</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal para Editar Animal -->
+<div id="editAnimalModal" class="modal hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Editar Animal - {{ animal.nome }}</h2>
+            <button class="modal-close" onclick="closeModal('editAnimalModal')">✕</button>
+        </div>
+        <form id="editAnimalForm" class="modal-body">
+            <div class="form-group">
+                <label class="form-label">Nome do Animal</label>
+                <input type="text" class="form-control" name="nome" value="{{ animal.nome }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Espécie</label>
+                <input type="text" class="form-control" name="especie" value="{{ animal.especie }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Raça</label>
+                <input type="text" class="form-control" name="raca" value="{{ animal.raca }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Idade (anos)</label>
+                <input type="number" class="form-control" name="idade" value="{{ animal.idade }}" min="0" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Estado de Saúde</label>
+                <input type="text" class="form-control" name="saude" value="{{ animal.saude if animal.saude else '' }}" placeholder="Ex: Saudável, Vacinado...">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Comportamento</label>
+                <textarea class="form-control" name="comportamento" rows="4" placeholder="Descrição do temperamento...">{{ animal.comportamento if animal.comportamento else '' }}</textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Data de Chegada</label>
+                <input type="date" class="form-control" name="data" value="{{ animal.data }}" required>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('editAnimalModal')">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal overlay -->
+<div id="modalOverlay" class="modal-overlay hidden" onclick="closeAllModals()"></div>
+
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modal.css') }}">
+<style>
+    .tarefa-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #27ae60;
+        margin-bottom: 10px;
+    }
+
+    .tarefa-item.urgente {
+        background: #fff3cd;
+        border-left-color: #ffc107;
+    }
+
+    .tarefa-icon {
+        font-size: 28px;
+        min-width: 40px;
+        text-align: center;
+    }
+
+    .tarefa-info {
+        flex: 1;
+    }
+
+    .tarefa-tipo {
+        font-size: 13px;
+        color: #7f8c8d;
+        margin-top: 4px;
+    }
+
+    .tarefa-tempo {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        min-width: 140px;
+    }
+
+    .tempo-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .badge-urgent {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .badge-soon {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .badge-ok {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .tempo-data {
+        font-size: 12px;
+        color: #7f8c8d;
+    }
+
+    .empty-tarefas {
+        text-align: center;
+        padding: 30px 20px;
+        color: #999;
+    }
+
+    .empty-tarefas-icon {
+        font-size: 32px;
+        margin-bottom: 10px;
+    }
+
+    .btn-add-task-icon {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        border-radius: 8px;
+    }
+
+    .btn-add-task-icon:hover {
+        background: rgba(112, 127, 221, 0.1);
+        transform: scale(1.1);
+    }
+
+    .btn-add-task-icon:active {
+        transform: scale(0.95);
+    }
+
+    .btn-add-task-icon svg {
+        width: 25px;
+        height: 25px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/modal.js') }}"></script>
+<script>
+// Carregar próximas tarefas do animal
+function carregarProximasTarefas(animalId) {
+    const container = document.getElementById('proximasTarefasContainer');
+
+    fetch(`/api/proximas-tarefas?animal_id=${animalId}`)
+        .then(response => response.json())
+        .then(tarefas => {
+            if (tarefas.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-tarefas">
+                        <div class="empty-tarefas-icon">✓</div>
+                        <div>Nenhuma tarefa cadastrada para este animal</div>
+                        <div style="font-size: 12px; color: #bbb; margin-top: 8px;">Clique em "Tarefas" para adicionar uma nova</div>
+                    </div>
+                `;
+            } else {
+                let html = '';
+                tarefas.forEach(tarefa => {
+                    const icon = obterIconeTarefa(tarefa.tarefa);
+                    const urgentClass = tarefa.contagem.urgente ? 'urgente' : '';
+
+                    let badgeClass = 'badge-ok';
+                    if (tarefa.contagem.status === 'urgente' || tarefa.contagem.status === 'atrasado' || tarefa.contagem.status === 'hoje') {
+                        badgeClass = 'badge-urgent';
+                    } else if (tarefa.contagem.status === 'proximo') {
+                        badgeClass = 'badge-soon';
+                    }
+
+                    html += `
+                        <div class="tarefa-item ${urgentClass}">
+                            <div class="tarefa-icon">${icon}</div>
+                            <div class="tarefa-info">
+                                <div style="font-weight: 600; color: #2c3e50;">${tarefa.tarefa}</div>
+                                <div class="tarefa-tipo">Responsável: ${tarefa.responsavel}</div>
+                            </div>
+                            <div class="tarefa-tempo">
+                                <span class="tempo-badge ${badgeClass}">${tarefa.contagem.mensagem}</span>
+                                <span class="tempo-data">${tarefa.data}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar tarefas:', error);
+            container.innerHTML = `
+                <div class="empty-tarefas">
+                    <div class="empty-tarefas-icon">⚠️</div>
+                    <div>Erro ao carregar tarefas</div>
+                </div>
+            `;
+        });
+}
+
+// Carregar tarefas ao abrir a página
+document.addEventListener('DOMContentLoaded', function() {
+    carregarProximasTarefas({{ animal.id }});
+});
+
+function editarAnimal(animalId) {
+    openModal('editAnimalModal');
+}
+
+function deletarAnimal(animalId) {
+    // Primeiro, contar quantas tarefas o animal tem
+    fetch(`/api/animals/${animalId}/tarefas-count`)
+        .then(response => response.json())
+        .then(data => {
+            let mensagem = 'Tem certeza que deseja remover este animal? Esta ação não pode ser desfeita.';
+
+            if (data.count && data.count > 0) {
+                mensagem += `\n\n⚠️ Atenção: Este animal tem ${data.count} tarefa${data.count > 1 ? 's' : ''} associada${data.count > 1 ? 's' : ''}.\n`;
+                mensagem += `Todas as tarefas serão deletadas junto com o animal.`;
+            }
+
+            showConfirmation(
+                'Confirmar Exclusão',
+                mensagem,
+                async function() {
+                    try {
+                        const response = await fetch(`/api/animals/${animalId}`, {
+                            method: 'DELETE'
+                        });
+
+                        if (response.ok) {
+                            showSuccess('Animal e suas tarefas removidos com sucesso!');
+                            setTimeout(() => {
+                                window.location.href = '/animals';
+                            }, 1500);
+                        } else {
+                            showError('Erro ao remover animal');
+                        }
+                    } catch (error) {
+                        showError('Erro ao processar requisição');
+                    }
+                }
+            );
+        })
+        .catch(error => {
+            console.error('Erro ao contar tarefas:', error);
+            // Se houver erro ao contar, prosseguir sem aviso
+            showConfirmation(
+                'Confirmar Exclusão',
+                'Tem certeza que deseja remover este animal? Esta ação não pode ser desfeita.',
+                async function() {
+                    try {
+                        const response = await fetch(`/api/animals/${animalId}`, {
+                            method: 'DELETE'
+                        });
+
+                        if (response.ok) {
+                            showSuccess('Animal removido com sucesso!');
+                            setTimeout(() => {
+                                window.location.href = '/animals';
+                            }, 1500);
+                        } else {
+                            showError('Erro ao remover animal');
+                        }
+                    } catch (error) {
+                        showError('Erro ao processar requisição');
+                    }
+                }
+            );
+        });
+}
+
+// Tratar envio do formulário
+document.getElementById('editAnimalForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const animalId = {{ animal.id }};
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData);
+
+    try {
+        const response = await fetch(`/api/animals/${animalId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            showSuccess('Animal atualizado com sucesso!');
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            showError('Erro ao atualizar animal');
+        }
+    } catch (error) {
+        showError('Erro ao processar requisição');
+    }
+});
+</script>
+{% endblock %}
