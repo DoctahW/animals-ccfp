@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block title %}Adotantes - Centro de Adoção{% endblock %}
+
+{% block content %}
+<!-- CONTENT AREA -->
+<div class="content-area">
+    <!-- FORMULÁRIO MULTI-STEP -->
+    <div class="adotante-form-container">
+        <!-- BARRA DE PROGRESSO -->
+        <div class="progress-bar-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text">
+                Seção <span id="currentStep">1</span> de <span id="totalSteps">8</span>
+            </div>
+        </div>
+
+        <!-- FORM MULTI-STEP -->
+        <form id="adotanteForm" class="adotante-form">
+            <!-- SEÇÃO 1: INFORMAÇÕES BÁSICAS (Obrigatória) -->
+            <fieldset class="form-section active" data-section="1">
+                <h3>Informações Básicas</h3>
+                <div class="form-group">
+                    <label class="form-label">Nome Completo *</label>
+                    <input type="text" class="form-control" name="nome" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email *</label>
+                    <input type="email" class="form-control" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Telefone</label>
+                    <input type="tel" class="form-control" name="telefone" placeholder="(XX) XXXXX-XXXX">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Idade</label>
+                    <input type="number" class="form-control" name="idade" min="18" max="150">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Profissão</label>
+                    <input type="text" class="form-control" name="profissao" placeholder="Ex: Professor, Veterinário...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Filhos</label>
+                    <input type="number" class="form-control" name="filhos" min="0" value="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Faixa Etária dos Filhos</label>
+                    <input type="text" class="form-control" name="filhos_faixa_etaria" placeholder="Ex: 3-5 anos, 10-15 anos">
+                </div>
+            </fieldset>
+
+            <!-- SEÇÃO 2: MORADIA (Obrigatória) -->
+            <fieldset class="form-section" data-section="2">
+                <h3>Informações de Moradia</h3>
+                <div class="form-group">
+                    <label class="form-label">Tipo de Moradia *</label>
+                    <select class="form-control" name="tipo_moradia" required>
+                        <option value="">Selecione...</option>
+                        <option value="apartamento">Apartamento</option>
+                        <option value="casa">Casa</option>
+                        <option value="chácara">Chácara</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tamanho da Moradia *</label>
+                    <select class="form-control" name="tamanho_moradia" required>
+                        <option value="">Selecione...</option>
+                        <option value="pequeno">Pequeno (até 50m²)</option>
+                        <option value="médio">Médio (50-100m²)</option>
+                        <option value="grande">Grande (acima de 100m²)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Possui Quintal? *</label>
+                    <select class="form-control" name="tem_quintal" required>
+                        <option value="">Selecione...</option>
+                        <option value="0">Não</option>
+                        <option value="1">Sim</option>
+                    </select>
+                </div>
+                <div class="form-group" id="tamanhoQuintalGroup" style="display: none;">
+                    <label class="form-label">Tamanho do Quintal</label>
+                    <select class="form-control" name="tamanho_quintal">
+                        <option value="">Selecione...</option>
+                        <option value="pequeno">Pequeno</option>
+                        <option value="médio">Médio</option>
+                        <option value="grande">Grande</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Localização *</label>
+                    <select class="form-control" name="localizacao" required>
+                        <option value="">Selecione...</option>
+                        <option value="urbana">Urbana (Cidade)</option>
+                        <option value="suburbana">Suburbana</option>
+                        <option value="rural">Rural</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Aluga ou Possui? *</label>
+                    <select class="form-control" name="aluga_ou_possui" required>
+                        <option value="">Selecione...</option>
+                        <option value="aluga">Aluga</option>
+                        <option value="possui">Possui</option>
+                    </select>
+                </div>
+            </fieldset>
+
+            <!-- SEÇÃO 3: ROTINA E DISPONIBILIDADE (Obrigatória) -->
+            <fieldset class="form-section" data-section="3">
+                <h3>Rotina e Disponibilidade</h3>
+                <div class="form-group">
+                    <label class="form-label">Horas de Trabalho por Dia (0-24) *</label>
+                    <input type="number" class="form-control" name="horas_trabalho_dia" min="0" max="24" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Horas que o Animal Ficaria Sozinho por Dia (0-24) *</label>
+                    <input type="number" class="form-control" name="horas_sozinho_dia" min="0" max="24" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Viagens Frequentes? *</label>
+                    <select class="form-control" name="viagens_frequentes" required>
+                        <option value="">Selecione...</option>
+                        <option value="0">Não</option>
+                        <option value="1">Sim</option>
+                    </select>
+                </div>
+                <div class="form-group" id="diasViagemGroup" style="display: none;">
+                    <label class="form-label">Quantos Dias por Ano (aproximadamente)</label>
+                    <input type="number" class="form-control" name="dias_viagem_ano" min="0" max="365">
+                </div>
+            </fieldset>
+
+            <!-- SEÇÃO 4: ESTILO DE VIDA (Obrigatória) -->
+            <fieldset class="form-section" data-section="4">
+                <h3>Estilo de Vida</h3>
+                <div class="form-group">
+                    <label class="form-label">Nível de Atividade *</label>
+                    <select class="form-control" name="nivel_atividade" required>
+                        <option value="">Selecione...</option>
+                        <option value="sedentário">Sedentário (pouca atividade física)</option>
+                        <option value="moderado">Moderado (atividade regular)</option>
+                        <option value="ativo">Ativo (exercício frequente)</option>
+                        <option value="muito_ativo">Muito Ativo (esportes e exercício intenso)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Hobbies e Interesses</label>
+                    <textarea class="form-control" name="hobbies" rows="3" placeholder="Ex: Leitura, esportes, culinária, filmes..."></textarea>
+                </div>
+            </fieldset>
+
+            <!-- SEÇÃO 5: EXPERIÊNCIA COM ANIMAIS (Opcional) -->
+            <fieldset class="form-section" data-section="5">
+                <h3>Experiência com Animais</h3>
+                <p class="section-label">(Opcional)</p>
+                <div class="form-group">
+                    <label class="form-label">Experiência Prévia</label>
+                    <select class="form-control" name="experiencia_previa">
+                        <option value="">Selecione...</option>
+                        <option value="nenhuma">Nenhuma experiência</option>
+                        <option value="pouca">Pouca experiência</option>
+                        <option value="média">Média experiência</option>
+                        <option value="muita">Muita experiência</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Já teve Animais?</label>
+                    <textarea class="form-control" name="animais_tidos" rows="3" placeholder="Ex: cachorro, gato, pássaro..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Problemas Passados com Animais?</label>
+                    <textarea class="form-control" name="problemas_passados" rows="3" placeholder="Descreva qualquer problema anterior..."></textarea>
+                </div>
+            </fieldset>
+
+            <!-- SEÇÃO 6: PREFERÊNCIAS DO ANIMAL (Opcional) -->
+            <fieldset class="form-section" data-section="6">
+                <h3>Preferências do Animal</h3>
+                <p class="section-label">(Opcional)</p>
+                <div class="form-group">
+                    <label class="form-label">Tamanho Preferido</label>
+                    <select class="form-control" name="tamanho_preferido">
+                        <option value="">Sem preferência</option>
+                        <option value="pequeno">Pequeno (até 5kg)</option>
+                        <option value="médio">Médio (5-20kg)</option>
+                        <option value="grande">Grande (acima de 20kg)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Idade Preferida</label>
+                    <select class="form-control" name="idade_preferida">
+                        <option value="">Sem preferência</option>
+                        <option value="filhote">Filhote</option>
+                        <option value="jovem">Jovem</option>
+                        <option value="adulto">Adulto</option>
+                        <option value="idoso">Idoso</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Gênero Preferido</label>
+                    <select class="form-control" name="genero_preferido">
+                        <option value="sem_preferência">Sem preferência</option>
+                        <option value="macho">Macho</option>
+                        <option value="fêmea">Fêmea</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Preferência por Traços de Personalidade</label>
+                    <select class="form-control" name="tem_preferencia_tracos" id="temPreferenciaTracos">
+                        <option value="0">Não tenho preferência (ignorar pesos de personalidade)</option>
+                        <option value="1">Tenho preferências (usar tags abaixo)</option>
+                    </select>
+                </div>
+
+                <div id="tagsPreferenciaContainer" style="display: none;">
+                    <h4>Tags de Personalidade Preferidas</h4>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item"><input type="checkbox" name="tags_ideais" value="Hiperativo"> Hiperativo ⚡</div>
+                        <div class="checkbox-item"><input type="checkbox" name="tags_ideais" value="Animador"> Animador 🎉</div>
+                        <div class="checkbox-item"><input type="checkbox" name="tags_ideais" value="Aventureiro"> Aventureiro 🧗</div>
+                        <div class="checkbox-item"><input type="checkbox" name="tags_ideais" value="Companheiro"> Companheiro 🤝</div>
+                        <div class="checkbox-item"><input type="checkbox" name="tags_ideais" value="Devoto"> Devoto 💕</div>
+                        <div class="checkbox-item"><input type="checkbox" name="tags_ideais" value="Carente"> Carente 🥺</div>
+                        <div class="checkbox-item"><input type="checkbox" name="tags_ideais" value="Atlético"> Atlético 🏃</div>
+                        <div class="checkbox-item"><input type="checkbox" name="tags_ideais" value="Rebelde"> Rebelde 🔥</div>
+                        <div class="checkbox-item"><input type="checkbox" name="tags_ideais" value="Guardião"> Guardião 🛡️</div>
+                        <div class="checkbox-item"><input type="checkbox" name="tags_ideais" value="Caçador"> Caçador 🎯</div>
+                        <div class="checkbox-item"><input type="checkbox" name="tags_ideais" value="Reservado"> Reservado 🧐</div>
+                        <div class="checkbox-item"><input type="checkbox" name="tags_ideais" value="Disciplinado"> Disciplinado 📚</div>
+                        <div class="checkbox-item"><input type="checkbox" name="tags_ideais" value="Soneca"> Soneca 😴</div>
+                        <div class="checkbox-item"><input type="checkbox" name="tags_ideais" value="Relaxado"> Relaxado 😎</div>
+                        <div class="checkbox-item"><input type="checkbox" name="tags_ideais" value="Tímido"> Tímido 🙈</div>
+                        <div class="checkbox-item"><input type="checkbox" name="tags_ideais" value="Arredio"> Arredio 🦁</div>
+                        <div class="checkbox-item"><input type="checkbox" name="tags_ideais" value="Indomável"> Indomável 👑</div>
+                        <div class="checkbox-item"><input type="checkbox" name="tags_ideais" value="Travesso"> Travesso 😈</div>
+                        <div class="checkbox-item"><input type="checkbox" name="tags_ideais" value="Misterioso"> Misterioso 🌙</div>
+                        <div class="checkbox-item"><input type="checkbox" name="tags_ideais" value="Alfa"> Alfa 🐺</div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- SEÇÃO 7: OUTROS ANIMAIS EM CASA (Opcional) -->
+            <fieldset class="form-section" data-section="7">
+                <h3>Outros Animais em Casa</h3>
+                <p class="section-label">(Opcional)</p>
+                <div class="form-group">
+                    <label class="form-label">Tem Outros Animais? *</label>
+                    <select class="form-control" name="tem_outros_animais" required>
+                        <option value="">Selecione...</option>
+                        <option value="0">Não</option>
+                        <option value="1">Sim</option>
+                    </select>
+                </div>
+                <div class="form-group" id="quantidadeAnimaisGroup" style="display: none;">
+                    <label class="form-label">Quantos Animais?</label>
+                    <input type="number" class="form-control" name="quantidade_outros_animais" min="1">
+                </div>
+                <div class="form-group" id="tipoAnimaisGroup" style="display: none;">
+                    <label class="form-label">Tipos de Animais</label>
+                    <textarea class="form-control" name="tipo_outros_animais" rows="3" placeholder="Ex: 1 cachorro, 2 gatos..."></textarea>
+                </div>
+            </fieldset>
+
+            <!-- SEÇÃO 8: RECURSOS E COMPROMETIMENTO (Opcional) -->
+            <fieldset class="form-section" data-section="8">
+                <h3>Recursos e Comprometimento</h3>
+                <p class="section-label">(Opcional)</p>
+                <div class="form-group">
+                    <label class="form-label">Orçamento Mensal Mínimo (R$)</label>
+                    <input type="number" class="form-control" name="orcamento_mensal_min" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Orçamento Mensal Máximo (R$)</label>
+                    <input type="number" class="form-control" name="orcamento_mensal_max" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Disponibilidade de Tempo Diário</label>
+                    <textarea class="form-control" name="disponibilidade_tempo_diario" rows="3" placeholder="Ex: 2 horas de manhã, 3 horas à noite..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Comprometimento com o Animal</label>
+                    <textarea class="form-control" name="comprometimento_texto" rows="4" placeholder="Conte-nos sobre seu comprometimento com o bem-estar e cuidados do animal..."></textarea>
+                </div>
+            </fieldset>
+
+            <!-- BOTÕES DE NAVEGAÇÃO -->
+            <div class="form-navigation">
+                <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;" onclick="previousStep()">
+                    ← Anterior
+                </button>
+                <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextStep()">
+                    Próximo →
+                </button>
+                <button type="submit" class="btn btn-success" id="submitBtn" style="display: none;">
+                    ✓ Enviar Cadastro
+                </button>
+            </div>
+
+            <!-- MENSAGENS -->
+            <div id="formMessage" class="form-message" style="display: none;"></div>
+        </form>
+    </div>
+
+    <!-- LISTA DE ADOTANTES (lado direito, pode ser expandido) -->
+    <div class="adotante-list" id="adotanteList">
+        <div class="empty-state">
+            <div class="empty-icon">👥</div>
+            <div class="empty-text">Nenhum adotante cadastrado</div>
+            <div class="empty-subtext">Preencha o formulário para registrar um novo adotante</div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/adotantes.css') }}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/services/adotante-service.js') }}"></script>
+<script src="{{ url_for('static', filename='js/forms/adotante-form.js') }}"></script>
+{% endblock %}

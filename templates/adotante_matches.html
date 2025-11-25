@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Compatibilidades - Adotante {% endblock %}
+
+{% block content %}
+<div class="content-area matches-layout">
+    <!-- PAINEL DO ADOTANTE -->
+    <div class="adotante-panel">
+        <div class="adotante-header">
+            <div class="adotante-avatar">👤</div>
+            <div class="adotante-info">
+                <h2 id="adotanteNome">Carregando...</h2>
+                <p id="adotanteDetails">Aguarde...</p>
+                <p id="adotanteEmail" class="email"></p>
+            </div>
+            <a href="/adotantes" class="btn btn-secondary btn-small">← Voltar</a>
+        </div>
+
+        <!-- DADOS DO FORMULÁRIO -->
+        <div class="adotante-profile-data" id="adotanteProfileData">
+            <h3>Perfil do Adotante</h3>
+            <div class="profile-sections">
+                <!-- MORADIA -->
+                <div class="profile-section">
+                    <div class="section-title">🏠 Moradia</div>
+                    <div class="section-content">
+                        <div class="data-item">
+                            <span class="data-label">Tipo:</span>
+                            <span class="data-value" id="tipoMoradia">-</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Tamanho:</span>
+                            <span class="data-value" id="tamanhoMoradia">-</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Quintal:</span>
+                            <span class="data-value" id="temQuintal">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROTINA -->
+                <div class="profile-section">
+                    <div class="section-title">⏰ Rotina</div>
+                    <div class="section-content">
+                        <div class="data-item">
+                            <span class="data-label">Horas sozinho/dia:</span>
+                            <span class="data-value" id="horasSozinho">-</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Nível de atividade:</span>
+                            <span class="data-value" id="nivelAtividade">-</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Viagens frequentes:</span>
+                            <span class="data-value" id="viagensFrequentes">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PREFERÊNCIAS -->
+                <div class="profile-section">
+                    <div class="section-title">💫 Preferências</div>
+                    <div class="section-content">
+                        <div class="data-item">
+                            <span class="data-label">Tamanho preferido:</span>
+                            <span class="data-value" id="tamanhoPreferido">-</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Idade preferida:</span>
+                            <span class="data-value" id="idadePreferida">-</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Experiência:</span>
+                            <span class="data-value" id="experienciaPrevia">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAGS IDEAIS -->
+                <div class="profile-section full-width">
+                    <div class="section-title">🏷️ Tags Ideais</div>
+                    <div class="section-content">
+                        <div class="tags-container" id="tagsIdeais">
+                            <span class="tag-badge">Carregando...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LISTA DE ANIMAIS COMPATÍVEIS -->
+    <div class="matches-container">
+        <div class="matches-header">
+            <h3>Animais Compatíveis</h3>
+            <div class="filter-tabs">
+                <button class="filter-btn active" data-filter="all" onclick="filterMatches('all')">
+                    Todos
+                </button>
+                <button class="filter-btn" data-filter="excellent" onclick="filterMatches('excellent')">
+                    ⭐ Excelente
+                </button>
+                <button class="filter-btn" data-filter="good" onclick="filterMatches('good')">
+                    ✓ Bom
+                </button>
+            </div>
+        </div>
+
+        <!-- ESTADO VAZIO -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-icon">🔍</div>
+            <div class="empty-text">Nenhum animal compatível encontrado</div>
+            <div class="empty-subtext">Tente ajustar suas preferências ou compatibilidade</div>
+        </div>
+
+        <!-- LISTA DE MATCHES -->
+        <div id="matchesList" class="matches-list">
+            <!-- Cards de animais serão inseridos aqui via JavaScript -->
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Detalhes do Animal -->
+<div id="animalDetailModal" class="modal hidden">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h2 id="modalAnimalNome">Detalhes do Animal</h2>
+            <button class="modal-close" onclick="closeModal('animalDetailModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="animalDetailContent">
+                <!-- Detalhes serão inseridos aqui -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal overlay -->
+<div id="modalOverlay" class="modal-overlay hidden" onclick="closeAllModals()"></div>
+
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/adotante-matches.css') }}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/services/adotante-service.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/animal-match-card.js') }}"></script>
+<script src="{{ url_for('static', filename='js/pages/adotante-matches.js') }}"></script>
+{% endblock %}

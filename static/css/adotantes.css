@@ -1,0 +1,431 @@
+/* ADOTANTES.CSS - Estilos para página de cadastro de adotantes */
+
+.content-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    padding: 24px;
+}
+
+/* FORMULÁRIO */
+.adotante-form-container {
+    background: white;
+    border-radius: 8px;
+    padding: 32px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* BARRA DE PROGRESSO */
+.progress-bar-container {
+    margin-bottom: 32px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4a90e2 0%, #357abd 100%);
+    transition: width 0.3s ease;
+    border-radius: 4px;
+}
+
+.progress-text {
+    font-size: 12px;
+    color: #666;
+    text-align: right;
+    font-weight: 500;
+}
+
+/* SEÇÕES DO FORMULÁRIO */
+.adotante-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-section {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.form-section.active {
+    display: block;
+    border: none;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-section h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.section-label {
+    font-size: 12px;
+    color: #999;
+    font-weight: 500;
+    margin-top: -16px;
+    margin-bottom: 16px;
+}
+
+/* CAMPOS DE FORMULÁRIO */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.form-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-label strong {
+    color: #e74c3c;
+}
+
+.form-control {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.form-control.invalid {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+/* NAVEGAÇÃO */
+.form-navigation {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.form-navigation .btn {
+    min-width: 120px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* BOTÕES */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: #4a90e2;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #357abd;
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+.btn-primary:active {
+    transform: translateY(1px);
+}
+
+.btn-secondary {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: #e0e0e0;
+}
+
+.btn-success {
+    background: #27ae60;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #229954;
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+}
+
+/* MENSAGENS */
+.form-message {
+    padding: 12px 16px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    display: none;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-message.info {
+    background: #e3f2fd;
+    color: #1976d2;
+    border: 1px solid #90caf9;
+}
+
+.form-message.success {
+    background: #f1f8e9;
+    color: #558b2f;
+    border: 1px solid #aed581;
+}
+
+.form-message.error {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ef9a9a;
+}
+
+/* LISTA DE ADOTANTES (LADO DIREITO) */
+.adotante-list {
+    background: white;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    max-height: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* CARDS DE ADOTANTES */
+.adotante-card {
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.adotante-card:hover {
+    border-color: #4a90e2;
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.card-avatar {
+    font-size: 36px;
+    min-width: 48px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 8px;
+}
+
+.card-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.card-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 4px 0;
+}
+
+.card-email {
+    font-size: 12px;
+    color: #999;
+    margin: 0;
+    word-break: break-word;
+}
+
+.card-details {
+    font-size: 12px;
+    color: #666;
+    margin: 4px 0 0 0;
+}
+
+.card-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-link {
+    flex: 1;
+    padding: 6px 8px;
+    background: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-link:hover {
+    background: #357abd;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 48px 24px;
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 48px;
+    opacity: 0.5;
+}
+
+.empty-text {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+}
+
+.empty-subtext {
+    font-size: 13px;
+    color: #999;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 1024px) {
+    .content-area {
+        grid-template-columns: 1fr;
+    }
+
+    .adotante-form-container {
+        padding: 24px;
+    }
+
+    .adotante-list {
+        max-height: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    .content-area {
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .adotante-form-container {
+        padding: 16px;
+    }
+
+    .form-section h3 {
+        font-size: 18px;
+    }
+
+    .form-navigation {
+        flex-direction: column-reverse;
+    }
+
+    .form-navigation .btn {
+        width: 100%;
+    }
+}
+
+/* ESTILOS DE VALIDAÇÃO */
+.form-control.invalid:focus {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+/* PLACEHOLDER */
+.form-control::placeholder {
+    color: #999;
+}
+
+/* TEXTAREA */
+textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+}
+
+/* SELECT */
+select.form-control {
+    cursor: pointer;
+}
+
+/* INPUTS NUMÉRICOS */
+input[type="number"].form-control,
+input[type="email"].form-control,
+input[type="tel"].form-control,
+input[type="date"].form-control {
+    padding: 10px 12px;
+}
+
+/* DISABLED FIELDS */
+.form-control:disabled {
+    background: #f9f9f9;
+    color: #999;
+    cursor: not-allowed;
+}

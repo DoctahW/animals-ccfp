@@ -20,6 +20,21 @@ from TAREFAS_CRUD import (
     remover_tarefas_por_animal,
     contar_tarefas_animal
 )
+from adotantes_crud import (
+    criar_tabela as criar_tabela_adotantes,
+    ler_adotantes,
+    ler_adotante_id,
+    adicionar_adotante,
+    atualizar_adotante,
+    deletar_adotante,
+    preparar_adotante_para_api,
+    buscar_adotante_por_email
+)
+from matching_engine import (
+    calcular_compatibilidade,
+    obter_matches_adotante,
+    obter_matches_animal
+)
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.config['JSON_AS_ASCII'] = False
@@ -27,6 +42,7 @@ app.config['JSON_AS_ASCII'] = False
 try:
     criar_tabela_animais()
     criar_tabela_tarefas()
+    criar_tabela_adotantes()
 except Exception as e:
     print(f"Erro ao inicializar tabelas: {e}")
 
@@ -219,6 +235,35 @@ def tasks_page():
     )
 
 
+@app.route('/adotantes')
+def adotantes_page():
+    adotantes = ler_adotantes()
+    stats = get_dashboard_stats()
+
+    return render_template(
+        'adotantes.html',
+        page='adotantes',
+        adotantes=adotantes,
+        total_animals=stats['total_animals'],
+        pending_tasks=stats['pending_tasks'],
+        in_treatment=stats['in_treatment']
+    )
+
+
+@app.route('/adotantes/<int:id>/matches')
+def adotante_matches_page(id):
+    """Renderiza página de compatibilidades para um adotante específico"""
+    stats = get_dashboard_stats()
+
+    return render_template(
+        'adotante_matches.html',
+        page='adotantes',
+        adotante_id=id,
+        total_animals=stats['total_animals'],
+        pending_tasks=stats['pending_tasks'],
+        in_treatment=stats['in_treatment']
+    )
+
 
 # ==================== ROTAS DA API ====================
 
@@ -277,7 +322,8 @@ def api_add_animal():
             data.get('saude', ''),
             data.get('comportamento', ''),
             data.get('data'),
-            data.get('status', 'Disponível')
+            data.get('status', 'Disponível'),
+            data.get('porte')
         )
 
         return jsonify({'success': 'Animal adicionado com sucesso'}), 201
@@ -325,8 +371,9 @@ def api_edit_animal(animal_id):
         comportamento = data.get('comportamento', animal['comportamento'])
         data_chegada = data.get('data', animal['data'])
         status = data.get('status', animal.get('status', 'Disponível'))
+        porte = data.get('porte', animal.get('porte'))
 
-        editar_animal(animal_id, nome, idade, raca, especie, saude, comportamento, data_chegada, status)
+        editar_animal(animal_id, nome, idade, raca, especie, saude, comportamento, data_chegada, status, porte)
 
         return jsonify({'success': 'Animal atualizado com sucesso'}), 200
 
@@ -728,6 +775,167 @@ def api_validate_task():
 
     except Exception as e:
         return jsonify({'error': f'Erro na validação: {str(e)}'}), 500
+
+@app.route('/api/adotantes', methods=['GET'])
+def api_listar_adotantes():
+    """Lista todos os adotantes"""
+    try:
+        adotantes = ler_adotantes()
+        adotantes_formatados = [preparar_adotante_para_api(a) for a in adotantes]
+        return jsonify(adotantes_formatados), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/adotantes/<int:adotante_id>', methods=['GET'])
+def api_obter_adotante(adotante_id):
+    """Obtém um adotante específico"""
+    try:
+        adotante = ler_adotante_id(adotante_id)
+        if not adotante:
+            return jsonify({'error': 'Adotante não encontrado'}), 404
+        return jsonify(preparar_adotante_para_api(adotante)), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/adotantes/add', methods=['POST'])
+def api_adicionar_adotante():
+    """Adiciona um novo adotante"""
+    try:
+        dados = request.json
+
+        if not dados.get('nome') or not dados.get('email'):
+            return jsonify({'error': 'Nome e email são obrigatórios'}), 400
+
+        existing = buscar_adotante_por_email(dados.get('email'))
+        if existing:
+            return jsonify({'error': 'Email já cadastrado'}), 409
+
+        adicionar_adotante(
+            nome=dados.get('nome'),
+            email=dados.get('email'),
+            telefone=dados.get('telefone'),
+            idade=dados.get('idade'),
+            profissao=dados.get('profissao'),
+            filhos=dados.get('filhos', 0),
+            tipo_moradia=dados.get('tipo_moradia'),
+            tamanho_moradia=dados.get('tamanho_moradia'),
+            tem_quintal=dados.get('tem_quintal', False),
+            tamanho_quintal=dados.get('tamanho_quintal'),
+            localizacao=dados.get('localizacao'),
+            aluga_ou_possui=dados.get('aluga_ou_possui'),
+            horas_trabalho_dia=dados.get('horas_trabalho_dia'),
+            horas_sozinho_dia=dados.get('horas_sozinho_dia'),
+            viagens_frequentes=dados.get('viagens_frequentes', False),
+            dias_viagem_ano=dados.get('dias_viagem_ano'),
+            nivel_atividade=dados.get('nivel_atividade'),
+            hobbies=dados.get('hobbies'),
+            experiencia_previa=dados.get('experiencia_previa'),
+            animais_tidos=dados.get('animais_tidos'),
+            problemas_passados=dados.get('problemas_passados'),
+            tamanho_preferido=dados.get('tamanho_preferido'),
+            idade_preferida=dados.get('idade_preferida'),
+            genero_preferido=dados.get('genero_preferido'),
+            tem_outros_animais=dados.get('tem_outros_animais', False),
+            quantidade_outros_animais=dados.get('quantidade_outros_animais'),
+            tipo_outros_animais=dados.get('tipo_outros_animais'),
+            orcamento_mensal_min=dados.get('orcamento_mensal_min'),
+            orcamento_mensal_max=dados.get('orcamento_mensal_max'),
+            disponibilidade_tempo_diario=dados.get('disponibilidade_tempo_diario'),
+            comprometimento_texto=dados.get('comprometimento_texto'),
+            tracos_preferidos=dados.get('tracos_preferidos'),
+            tags_ideais=dados.get('tags_ideais'),
+            tem_preferencia_tracos=dados.get('tem_preferencia_tracos', False)
+        )
+
+        return jsonify({'success': 'Adotante cadastrado com sucesso'}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/adotantes/<int:adotante_id>', methods=['PUT'])
+def api_atualizar_adotante(adotante_id):
+    """Atualiza um adotante"""
+    try:
+        adotante = ler_adotante_id(adotante_id)
+        if not adotante:
+            return jsonify({'error': 'Adotante não encontrado'}), 404
+
+        dados = request.json
+
+        atualizar_adotante(adotante_id, **dados)
+
+        return jsonify({'success': 'Adotante atualizado com sucesso'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/adotantes/<int:adotante_id>', methods=['DELETE'])
+def api_deletar_adotante(adotante_id):
+    """Deleta um adotante"""
+    try:
+        adotante = ler_adotante_id(adotante_id)
+        if not adotante:
+            return jsonify({'error': 'Adotante não encontrado'}), 404
+
+        deletar_adotante(adotante_id)
+
+        return jsonify({'success': 'Adotante deletado com sucesso'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/matching/score', methods=['GET'])
+def api_score_matching():
+    """Obtém score detalhado de compatibilidade entre animal e adotante"""
+    try:
+        animal_id = request.args.get('animal_id', type=int)
+        adotante_id = request.args.get('adotante_id', type=int)
+
+        if not animal_id or not adotante_id:
+            return jsonify({'error': 'animal_id e adotante_id são obrigatórios'}), 400
+
+        compat = calcular_compatibilidade(animal_id, adotante_id)
+        if not compat:
+            return jsonify({'error': 'Animal ou adotante não encontrado'}), 404
+
+        return jsonify(compat), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/adotantes/<int:adotante_id>/matches', methods=['GET'])
+def api_matches_adotante(adotante_id):
+    """Obtém animais compatíveis para um adotante (score >= 50%)"""
+    try:
+        adotante = ler_adotante_id(adotante_id)
+        if not adotante:
+            return jsonify({'error': 'Adotante não encontrado'}), 404
+
+        min_score = request.args.get('min_score', 50, type=int)
+        matches = obter_matches_adotante(adotante_id, min_score=min_score)
+
+        return jsonify(matches), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/matching/animal/<int:animal_id>', methods=['GET'])
+def api_matches_animal(animal_id):
+    """Obtém adotantes compatíveis para um animal (score >= 50%)"""
+    try:
+        animal = ler_animal_id(animal_id)
+        if not animal:
+            return jsonify({'error': 'Animal não encontrado'}), 404
+
+        min_score = request.args.get('min_score', 50, type=int)
+        matches = obter_matches_animal(animal_id, min_score=min_score)
+
+        return jsonify(matches), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 @app.errorhandler(404)
 def not_found(error):

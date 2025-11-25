@@ -80,49 +80,60 @@
             <h2>Adicionar Novo Animal</h2>
             <button class="modal-close" onclick="closeModal('addAnimalModal')">✕</button>
         </div>
-        <form id="addAnimalForm" class="modal-body">
-            <div class="form-group">
-                <label class="form-label">Nome do Animal</label>
-                <input type="text" class="form-control" name="nome" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Espécie</label>
-                <select class="form-control" name="especie" required>
-                    <option value="">Selecione...</option>
-                    <option value="Cachorro">Cachorro</option>
-                    <option value="Gato">Gato</option>
-                    <option value="Coelho">Coelho</option>
-                    <option value="Pássaro">Pássaro</option>
-                    <option value="Outro">Outro</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Raça</label>
-                <input type="text" class="form-control" name="raca" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Idade (anos)</label>
-                <input type="number" class="form-control" name="idade" min="0" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Estado de Saúde</label>
-                <input type="text" class="form-control" name="saude" placeholder="Ex: Saudável, Vacinado...">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Traços de Personalidade</label>
-                <div id="personalidadeAddAnimal"></div>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Data de Chegada</label>
-                <input type="date" class="form-control" name="data" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Status</label>
-                <select class="form-control" name="status" required>
-                    <option value="Disponível">Disponível</option>
-                    <option value="Em Processo">Em Processo</option>
-                    <option value="Em Tratamento">Em Tratamento</option>
-                </select>
+        <form id="addAnimalForm">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Nome do Animal</label>
+                    <input type="text" class="form-control" name="nome" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Espécie</label>
+                    <select class="form-control" name="especie" required>
+                        <option value="">Selecione...</option>
+                        <option value="Cachorro">Cachorro</option>
+                        <option value="Gato">Gato</option>
+                        <option value="Coelho">Coelho</option>
+                        <option value="Pássaro">Pássaro</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Raça</label>
+                    <input type="text" class="form-control" name="raca" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Idade (anos)</label>
+                    <input type="number" class="form-control" name="idade" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Porte</label>
+                    <select class="form-control" name="porte" required>
+                        <option value="">Selecione o porte...</option>
+                        <option value="Pequeno">Pequeno</option>
+                        <option value="Médio">Médio</option>
+                        <option value="Grande">Grande</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Estado de Saúde</label>
+                    <input type="text" class="form-control" name="saude" placeholder="Ex: Saudável, Vacinado...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Traços de Personalidade</label>
+                    <div id="personalidadeAddAnimal"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Data de Chegada</label>
+                    <input type="date" class="form-control" name="data" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-control" name="status" required>
+                        <option value="Disponível">Disponível</option>
+                        <option value="Em Processo">Em Processo</option>
+                        <option value="Em Tratamento">Em Tratamento</option>
+                    </select>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('addAnimalModal')">Cancelar</button>
@@ -139,50 +150,61 @@
             <h2>Editar Animal</h2>
             <button class="modal-close" onclick="closeModal('editAnimalModal')">✕</button>
         </div>
-        <form id="editAnimalForm" class="modal-body">
+        <form id="editAnimalForm">
             <input type="hidden" id="editAnimalId" name="animalId">
-            <div class="form-group">
-                <label class="form-label">Nome do Animal</label>
-                <input type="text" class="form-control" id="editNome" name="nome" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Espécie</label>
-                <select class="form-control" id="editEspecie" name="especie" required>
-                    <option value="">Selecione...</option>
-                    <option value="Cachorro">Cachorro</option>
-                    <option value="Gato">Gato</option>
-                    <option value="Coelho">Coelho</option>
-                    <option value="Pássaro">Pássaro</option>
-                    <option value="Outro">Outro</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Raça</label>
-                <input type="text" class="form-control" id="editRaca" name="raca" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Idade (anos)</label>
-                <input type="number" class="form-control" id="editIdade" name="idade" min="0" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Estado de Saúde</label>
-                <input type="text" class="form-control" id="editSaude" name="saude" placeholder="Ex: Saudável, Vacinado...">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Traços de Personalidade</label>
-                <div id="personalidadeEditAnimal"></div>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Data de Chegada</label>
-                <input type="date" class="form-control" id="editData" name="data" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Status</label>
-                <select class="form-control" id="editStatus" name="status" required>
-                    <option value="Disponível">Disponível</option>
-                    <option value="Em Processo">Em Processo</option>
-                    <option value="Em Tratamento">Em Tratamento</option>
-                </select>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Nome do Animal</label>
+                    <input type="text" class="form-control" id="editNome" name="nome" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Espécie</label>
+                    <select class="form-control" id="editEspecie" name="especie" required>
+                        <option value="">Selecione...</option>
+                        <option value="Cachorro">Cachorro</option>
+                        <option value="Gato">Gato</option>
+                        <option value="Coelho">Coelho</option>
+                        <option value="Pássaro">Pássaro</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Raça</label>
+                    <input type="text" class="form-control" id="editRaca" name="raca" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Idade (anos)</label>
+                    <input type="number" class="form-control" id="editIdade" name="idade" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Porte</label>
+                    <select class="form-control" id="editPorte" name="porte" required>
+                        <option value="">Selecione o porte...</option>
+                        <option value="Pequeno">Pequeno</option>
+                        <option value="Médio">Médio</option>
+                        <option value="Grande">Grande</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Estado de Saúde</label>
+                    <input type="text" class="form-control" id="editSaude" name="saude" placeholder="Ex: Saudável, Vacinado...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Traços de Personalidade</label>
+                    <div id="personalidadeEditAnimal"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Data de Chegada</label>
+                    <input type="date" class="form-control" id="editData" name="data" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-control" id="editStatus" name="status" required>
+                        <option value="Disponível">Disponível</option>
+                        <option value="Em Processo">Em Processo</option>
+                        <option value="Em Tratamento">Em Tratamento</option>
+                    </select>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('editAnimalModal')">Cancelar</button>

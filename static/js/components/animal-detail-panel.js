@@ -39,6 +39,9 @@ class AnimalDetailPanel {
 
         // Carregar tarefas
         this.renderTarefas(animal.id, containerId, showFullPage);
+
+        // Carregar adotantes compatíveis
+        this.renderAdotantes(animal.id, containerId);
     }
 
     /**
@@ -75,12 +78,16 @@ class AnimalDetailPanel {
                             <div class="info-value">${animal.raca}</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Idade</div>
-                            <div class="info-value">${animal.idade_formatada || (animal.idade + ' ' + (animal.idade == 1 ? 'ano' : 'anos'))}</div>
+                            <div class="info-label">Porte</div>
+                            <div class="info-value">${animal.porte}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">Status</div>
                             <span class="badge ${statusClass}" id="statusBadge" style="margin-top: 0;">● ${animal.status || 'Disponível'}</span>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Idade</div>
+                            <div class="info-value">${animal.idade_formatada || (animal.idade + ' ' + (animal.idade == 1 ? 'ano' : 'anos'))}</div>
                         </div>
                     </div>
                 </div>
@@ -114,6 +121,17 @@ class AnimalDetailPanel {
                         <div style="text-align: center; padding: 30px 20px; color: #999;">
                             <div style="font-size: 20px; margin-bottom: 8px;">⏳</div>
                             <div style="font-size: 13px;">Carregando tarefas...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- POTENCIAIS ADOTANTES -->
+                <div class="detail-section">
+                    <div class="section-title">👥 Potenciais Adotantes</div>
+                    <div id="potenciaisAdotantesDetailPanel" style="min-height: 100px;">
+                        <div style="text-align: center; padding: 30px 20px; color: #999;">
+                            <div style="font-size: 20px; margin-bottom: 8px;">⏳</div>
+                            <div style="font-size: 13px;">Carregando adotantes compatíveis...</div>
                         </div>
                     </div>
                 </div>
@@ -195,6 +213,93 @@ class AnimalDetailPanel {
                     </div>
                 `;
             });
+    }
+
+    /**
+     * Renderiza potenciais adotantes compatíveis
+     */
+    static renderAdotantes(animalId, containerId) {
+        const container = document.getElementById('potenciaisAdotantesDetailPanel');
+        if (!container) return;
+
+        fetch(`/api/matching/animal/${animalId}`)
+            .then(response => response.json())
+            .then(matches => {
+                // Filtrar apenas top 3 com score >= 70%
+                const topMatches = matches
+                    .filter(m => m.compatibility.score >= 70)
+                    .sort((a, b) => b.compatibility.score - a.compatibility.score)
+                    .slice(0, 3);
+
+                if (topMatches.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 20px; color: #999;">
+                            <div style="font-size: 20px; margin-bottom: 8px;">🔍</div>
+                            <div style="font-size: 13px;">Nenhum adotante compatível encontrado</div>
+                        </div>
+                    `;
+                } else {
+                    let html = '';
+                    topMatches.forEach((match, index) => {
+                        const adotante = match.adotante;
+                        const compatibility = match.compatibility;
+                        const compatLevel = this.getCompatibilityLevelLabel(compatibility.score);
+                        const compatColor = this.getCompatibilityColor(compatibility.score);
+
+                        html += `
+                            <div style="padding: 12px; background: #f8f9fa; border-radius: 6px; margin-bottom: 8px; border-left: 4px solid ${compatColor};">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+                                    <div style="flex: 1; min-width: 0;">
+                                        <div style="font-weight: 600; color: #2c3e50; font-size: 14px;">${adotante.nome}</div>
+                                        <div style="font-size: 12px; color: #7f8c8d; margin-top: 2px;">
+                                            ${adotante.idade || '?'} anos • ${adotante.localizacao || 'Não informado'}
+                                        </div>
+                                    </div>
+                                    <div style="text-align: right; flex-shrink: 0;">
+                                        <div style="font-size: 18px; font-weight: 700; color: ${compatColor};">${compatibility.score}%</div>
+                                        <div style="font-size: 10px; color: #999; font-weight: 600; text-transform: uppercase;">${compatLevel}</div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 8px; display: flex; gap: 8px;">
+                                    <a href="/adotantes/${adotante.id}/matches" style="flex: 1; display: inline-block; padding: 6px 8px; background: white; border: 1px solid #ddd; border-radius: 4px; font-size: 11px; color: #4a90e2; text-decoration: none; text-align: center; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#4a90e2'; this.style.color='white';" onmouseout="this.style.background='white'; this.style.color='#4a90e2';">
+                                        Ver Perfil
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = html;
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao carregar adotantes compatíveis:', error);
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #999;">
+                        <div style="font-size: 20px; margin-bottom: 8px;">⚠️</div>
+                        <div style="font-size: 13px;">Erro ao carregar adotantes</div>
+                    </div>
+                `;
+            });
+    }
+
+    /**
+     * Obtém label de compatibilidade
+     */
+    static getCompatibilityLevelLabel(score) {
+        if (score >= 80) return 'Excelente';
+        if (score >= 65) return 'Bom';
+        if (score >= 50) return 'Moderado';
+        return 'Baixo';
+    }
+
+    /**
+     * Obtém cor de compatibilidade
+     */
+    static getCompatibilityColor(score) {
+        if (score >= 80) return '#27ae60';
+        if (score >= 65) return '#3498db';
+        if (score >= 50) return '#f39c12';
+        return '#e74c3c';
     }
 
     /**

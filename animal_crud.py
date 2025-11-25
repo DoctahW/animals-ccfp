@@ -192,32 +192,14 @@ def criar_tabela():
             comportamento TEXT,
             data TEXT,
             status TEXT DEFAULT 'Disponível',
-            tags TEXT)
+            tags TEXT,
+            porte TEXT)
                 """)
     conn.commit()
-
-    # Verificar quais colunas existem e adicionar as faltantes
-    cur.execute("PRAGMA table_info(animais)")
-    colunas = [coluna[1] for coluna in cur.fetchall()]
-
-    if 'status' not in colunas:
-        try:
-            cur.execute("ALTER TABLE animais ADD COLUMN status TEXT DEFAULT 'Disponível'")
-            conn.commit()
-        except sqlite3.OperationalError:
-            pass
-
-    if 'tags' not in colunas:
-        try:
-            cur.execute("ALTER TABLE animais ADD COLUMN tags TEXT")
-            conn.commit()
-        except sqlite3.OperationalError:
-            pass
-
     conn.close()
 
 
-def adicionar_animal(nome, idade, raca, especie, saude, comportamento, data, status='Disponível'):
+def adicionar_animal(nome, idade, raca, especie, saude, comportamento, data, status='Disponível', porte=None):
     #Adicionar novo animal ao banco
     # Gerar tags baseado no comportamento
     tags = gerar_tags_personalidade(comportamento)
@@ -225,8 +207,8 @@ def adicionar_animal(nome, idade, raca, especie, saude, comportamento, data, sta
 
     conn = sqlite3.connect(BANCO)
     conn.execute(
-        "INSERT INTO animais(nome, idade, raca, especie, saude, comportamento, data, status, tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        (nome, idade, raca, especie, saude, comportamento, data, status, tags_json)
+        "INSERT INTO animais(nome, idade, raca, especie, saude, comportamento, data, status, tags, porte) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (nome, idade, raca, especie, saude, comportamento, data, status, tags_json, porte)
     )
     conn.commit()
     conn.close()
@@ -256,7 +238,7 @@ def remover_animal(animal_id):
     conn.close()
 
 
-def editar_animal(animal_id, nome, idade, raca, especie, saude, comportamento, data, status='Disponível'):
+def editar_animal(animal_id, nome, idade, raca, especie, saude, comportamento, data, status='Disponível', porte=None):
     #Edita dados de um animal
     # Gerar tags baseado no comportamento
     tags = gerar_tags_personalidade(comportamento)
@@ -264,8 +246,8 @@ def editar_animal(animal_id, nome, idade, raca, especie, saude, comportamento, d
 
     conn = sqlite3.connect(BANCO)
     conn.execute(
-        "UPDATE animais SET nome=?, idade=?, raca=?, especie=?, saude=?, comportamento=?, data=?, status=?, tags=? WHERE id=?",
-        (nome, idade, raca, especie, saude, comportamento, data, status, tags_json, animal_id)
+        "UPDATE animais SET nome=?, idade=?, raca=?, especie=?, saude=?, comportamento=?, data=?, status=?, tags=?, porte=? WHERE id=?",
+        (nome, idade, raca, especie, saude, comportamento, data, status, tags_json, porte, animal_id)
     )
     conn.commit()
     conn.close()

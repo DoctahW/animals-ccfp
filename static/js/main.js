@@ -192,6 +192,7 @@ async function editarAnimal(animalId) {
         document.getElementById('editEspecie').value = animal.especie;
         document.getElementById('editRaca').value = animal.raca;
         document.getElementById('editIdade').value = animal.idade;
+        document.getElementById('editPorte').value = animal.porte || '';
         document.getElementById('editSaude').value = animal.saude || '';
         document.getElementById('editData').value = animal.data;
         document.getElementById('editStatus').value = animal.status || 'Disponível';
@@ -224,6 +225,7 @@ async function editarAnimal(animalId) {
                     especie: document.getElementById('editEspecie').value,
                     raca: document.getElementById('editRaca').value,
                     idade: parseInt(document.getElementById('editIdade').value),
+                    porte: document.getElementById('editPorte').value,
                     saude: document.getElementById('editSaude').value,
                     comportamento: JSON.stringify(personalidade),
                     data: document.getElementById('editData').value,

@@ -88,7 +88,14 @@ function attachSearchListener() {
 
         // Se vazio, mostrar todos os animais
         if (!searchTerm) {
-            renderAnimalList([], 'all');
+            // Buscar todos os animais via API
+            AnimalService.getAllAnimals()
+                .then(animals => renderAnimalList(animals, 'all'))
+                .catch(error => {
+                    console.error('Erro ao buscar todos os animais:', error);
+                    showError('Erro ao carregar animais');
+                    renderAnimalList([], 'all');
+                });
             return;
         }
 
@@ -139,6 +146,8 @@ function attachFormListener() {
             const submitButton = form.querySelector('button[type="submit"]');
             setButtonLoading(submitButton, true);
 
+            console.log('Dados sendo enviados:', data);
+
             const response = await apiPost('/api/animals/add', data);
 
             // Sucesso
@@ -151,6 +160,11 @@ function attachFormListener() {
             }, 1500);
         } catch (error) {
             console.error('Erro ao adicionar animal:', error);
+
+            // Mostrar mensagem de erro mais detalhada
+            const errorMessage = error.message || 'Erro ao adicionar animal';
+            showError(errorMessage);
+
             setButtonLoading(form.querySelector('button[type="submit"]'), false);
         }
     });

@@ -50,7 +50,7 @@
 
 /* MODAL HEADER */
 .modal-header {
-    padding: var(--spacing-xl);
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
@@ -59,9 +59,10 @@
 }
 
 .modal-header h2 {
-    font-size: var(--font-size-large);
+    font-size: 18px;
     color: var(--text-dark);
     margin: 0;
+    font-weight: 600;
 }
 
 .modal-close {
@@ -87,24 +88,26 @@
 
 /* MODAL BODY */
 .modal-body {
-    padding: var(--spacing-xl);
+    padding: 16px 20px;
     overflow-y: auto;
     flex: 1;
 }
 
 /* MODAL FOOTER */
 .modal-footer {
-    padding: var(--spacing-lg) var(--spacing-xl);
+    padding: 12px 20px;
     border-top: 1px solid var(--border-color);
     display: flex;
     justify-content: flex-end;
-    gap: var(--spacing-lg);
+    gap: 10px;
     flex-shrink: 0;
     background: var(--light-bg);
 }
 
 .modal-footer .btn {
     margin: 0;
+    padding: 8px 16px;
+    font-size: 13px;
 }
 
 /* Success/Error States */
@@ -114,4 +117,42 @@
 
 .modal.modal-error .modal-header {
     border-bottom-color: var(--danger-color);
+}
+
+/* FORM ELEMENTS INSIDE MODAL - Compact sizing */
+.modal .form-group {
+    margin-bottom: 12px;
+}
+
+.modal .form-label {
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.modal .form-control {
+    padding: 8px 10px;
+    font-size: 13px;
+    border-width: 1px;
+}
+
+.modal .form-control:focus {
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+/* Personality sliders inside modal */
+.modal .personality-slider-container {
+    margin-bottom: 8px;
+}
+
+.modal .slider-wrapper {
+    gap: 8px;
+}
+
+.modal .slider-label-left,
+.modal .slider-label-right {
+    font-size: 11px;
+}
+
+.modal .personality-slider {
+    height: 4px;
 }
