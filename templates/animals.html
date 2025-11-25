@@ -109,8 +109,8 @@
                 <input type="text" class="form-control" name="saude" placeholder="Ex: Saudável, Vacinado...">
             </div>
             <div class="form-group">
-                <label class="form-label">Comportamento</label>
-                <textarea class="form-control" name="comportamento" rows="3" placeholder="Descrição do temperamento..."></textarea>
+                <label class="form-label">Traços de Personalidade</label>
+                <div id="personalidadeAddAnimal"></div>
             </div>
             <div class="form-group">
                 <label class="form-label">Data de Chegada</label>
@@ -169,8 +169,8 @@
                 <input type="text" class="form-control" id="editSaude" name="saude" placeholder="Ex: Saudável, Vacinado...">
             </div>
             <div class="form-group">
-                <label class="form-label">Comportamento</label>
-                <textarea class="form-control" id="editComportamento" name="comportamento" rows="3" placeholder="Descrição do temperamento..."></textarea>
+                <label class="form-label">Traços de Personalidade</label>
+                <div id="personalidadeEditAnimal"></div>
             </div>
             <div class="form-group">
                 <label class="form-label">Data de Chegada</label>
@@ -244,6 +244,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{{ url_for('static', filename='js/personality-traits.js') }}"></script>
 <script src="{{ url_for('static', filename='js/animals.js') }}"></script>
 <script src="{{ url_for('static', filename='js/tasks.js') }}"></script>
 
@@ -286,9 +287,30 @@ if (addTaskBtn) {
     });
 }
 
+// Renderizar sliders de personalidade nos formulários
+function inicializarPersonalidadeFormsAnimals() {
+    // Add animal form
+    const addDiv = document.getElementById('personalidadeAddAnimal');
+    if (addDiv) {
+        addDiv.innerHTML = renderizarTodosSliders();
+        inicializarSlidersListener();
+    }
+
+    // Edit animal form
+    const editDiv = document.getElementById('personalidadeEditAnimal');
+    if (editDiv) {
+        editDiv.innerHTML = renderizarTodosSliders();
+        inicializarSlidersListener();
+    }
+}
+
+// Renderizar formulário de editar animal com dados atuais
+// (A lógica de edição está no main.js na função editarAnimal())
+
 // Carregar animais também quando a página carrega (para caso de reload)
 document.addEventListener('DOMContentLoaded', function() {
     carregarAnimaisNoDropdown();
+    inicializarPersonalidadeFormsAnimals();
 });
 </script>
 {% endblock %}

@@ -125,8 +125,8 @@
                 <input type="text" class="form-control" name="saude" placeholder="Ex: Saudável, Vacinado...">
             </div>
             <div class="form-group">
-                <label class="form-label">Comportamento</label>
-                <textarea class="form-control" name="comportamento" rows="3" placeholder="Descrição do temperamento..."></textarea>
+                <label class="form-label">Traços de Personalidade</label>
+                <div id="personalidadeAddAnimalDash"></div>
             </div>
             <div class="form-group">
                 <label class="form-label">Data de Chegada</label>
@@ -185,8 +185,8 @@
                 <input type="text" class="form-control" id="editSaude" name="saude" placeholder="Ex: Saudável, Vacinado...">
             </div>
             <div class="form-group">
-                <label class="form-label">Comportamento</label>
-                <textarea class="form-control" id="editComportamento" name="comportamento" rows="3" placeholder="Descrição do temperamento..."></textarea>
+                <label class="form-label">Traços de Personalidade</label>
+                <div id="personalidadeEditAnimal"></div>
             </div>
             <div class="form-group">
                 <label class="form-label">Data de Chegada</label>
@@ -260,5 +260,29 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{{ url_for('static', filename='js/personality-traits.js') }}"></script>
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+<script>
+// Renderizar sliders de personalidade nos formulários do dashboard
+function inicializarPersonalidadeFormsDashboard() {
+    // Add animal form
+    const addDiv = document.getElementById('personalidadeAddAnimalDash');
+    if (addDiv) {
+        addDiv.innerHTML = renderizarTodosSliders();
+        inicializarSlidersListener();
+    }
+
+    // Note: Edit animal form sliders are populated by editarAnimal() function in main.js
+    // with actual data from the animal being edited
+}
+
+// Nota: Os listeners dos formulários estão em animals.js
+// e main.js (para edição). Não duplicar aqui.
+
+// Inicializar quando página carrega
+document.addEventListener('DOMContentLoaded', function() {
+    inicializarPersonalidadeFormsDashboard();
+});
+</script>
 {% endblock %}

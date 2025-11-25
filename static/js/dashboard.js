@@ -32,7 +32,7 @@ function setupEventListeners() {
 }
 
 /**
- * Anexa listeners aos botões de filtro
+ * Anexa listeners aos botões de filtro - REFATORADO PARA USAR API
  */
 function attachFilterListeners() {
     const filterButtons = document.querySelectorAll('.filter-btn');
@@ -45,77 +45,75 @@ function attachFilterListeners() {
             // Adicionar classe active ao botão clicado
             this.classList.add('active');
 
-            // Aplicar filtro
+            // Aplicar filtro via API
             const filterType = this.getAttribute('data-filter');
-            applyFilter(filterType);
+            applyFilterViaAPI(filterType);
         });
     });
 }
 
 /**
- * Aplica filtro à lista de animais
+ * Aplica filtro via API e renderiza resultados
  * @param {string} filterType - Tipo de filtro
  */
-function applyFilter(filterType) {
-    const animalCards = document.querySelectorAll('.animal-card');
+async function applyFilterViaAPI(filterType) {
+    try {
+        let filtros = {};
 
-    animalCards.forEach(card => {
-        if (filterType === 'all') {
-            card.style.display = '';
-        } else {
-            const especie = card.getAttribute('data-especie');
-            if (filterType === 'dog' && especie === 'cachorro') {
-                card.style.display = '';
-            } else if (filterType === 'cat' && especie === 'gato') {
-                card.style.display = '';
-            } else if (filterType === 'available') {
-                card.style.display = '';
-            } else {
-                card.style.display = 'none';
-            }
+        // Mapear tipos de filtro para parâmetros de API
+        if (filterType === 'dog') {
+            filtros.especie = 'Cachorro';
+        } else if (filterType === 'cat') {
+            filtros.especie = 'Gato';
+        } else if (filterType === 'available') {
+            filtros.status = 'Disponível';
         }
-    });
+
+        // Buscar dados via API centralizada
+        const animals = filterType === 'all'
+            ? await AnimalService.getAllAnimals()
+            : await AnimalService.filterAnimals(filtros);
+
+        // Atualizar DOM com resultados
+        renderAnimalList(animals, filterType);
+    } catch (error) {
+        console.error('Erro ao aplicar filtro:', error);
+        showError('Erro ao aplicar filtro');
+    }
 }
 
 /**
- * Anexa listener ao campo de busca
+ * Anexa listener ao campo de busca - REFATORADO PARA USAR API
  */
 function attachSearchListener() {
     const searchInput = document.getElementById('searchAnimals');
 
     if (!searchInput) return;
 
+    // Debounce para evitar muitas requisições
+    let debounceTimer;
+
     searchInput.addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        const animalCards = document.querySelectorAll('.animal-card');
+        clearTimeout(debounceTimer);
 
-        animalCards.forEach(card => {
-            const name = card.querySelector('.animal-name').textContent.toLowerCase();
-            const breed = card.querySelector('.animal-details').textContent.toLowerCase();
+        const searchTerm = e.target.value.trim();
 
-            if (name.includes(searchTerm) || breed.includes(searchTerm)) {
-                card.style.display = '';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-
-        // Mostrar mensagem se nenhum resultado
-        const visibleCards = Array.from(animalCards).filter(card => card.style.display !== 'none');
-        if (visibleCards.length === 0) {
-            const listContainer = document.getElementById('animalList');
-            if (listContainer.querySelector('.empty-state')) {
-                // Já tem empty state
-            } else {
-                listContainer.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">🔍</div>
-                        <div class="empty-text">Nenhum animal encontrado</div>
-                        <div class="empty-subtext">"${searchTerm}" não corresponde a nenhum animal</div>
-                    </div>
-                `;
-            }
+        // Se vazio, mostrar todos os animais
+        if (!searchTerm) {
+            renderAnimalList([], 'all');
+            return;
         }
+
+        // Fazer busca via API com delay
+        debounceTimer = setTimeout(async () => {
+            try {
+                const results = await AnimalService.searchAnimals(searchTerm);
+                renderAnimalList(results, 'all');
+            } catch (error) {
+                console.error('Erro ao buscar:', error);
+                showError('Erro ao buscar animais');
+            }
+        }, 300);
     });
 }
 

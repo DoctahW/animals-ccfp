@@ -132,6 +132,7 @@ function attachAnimalCardListeners() {
 /**
  * Carrega detalhes do animal no painel lateral
  * @param {number} animalId - ID do animal
+ * REFATORADO: Usa componente AnimalDetailPanel para remover duplicação
  */
 async function carregarDetalhesAnimal(animalId) {
     try {
@@ -140,100 +141,13 @@ async function carregarDetalhesAnimal(animalId) {
         if (!response.ok) throw new Error('Animal não encontrado');
 
         const animal = await response.json();
-        const detailPanel = document.getElementById('detailPanel');
 
-        // Renderizar detalhes
-        detailPanel.innerHTML = `
-            <div class="detail-header">
-                <div class="detail-title">
-                    <h2>${animal.nome}</h2>
-                    <div class="detail-subtitle">ID: #${animal.id} • Cadastrada em ${animal.data}</div>
-                </div>
-                <div class="action-buttons">
-                    <button class="btn btn-secondary" onclick="editarAnimal(${animal.id})">✏️ Editar</button>
-                    <button class="btn btn-danger" onclick="deletarAnimal(${animal.id})">🗑️ Remover</button>
-                </div>
-            </div>
-
-            <div class="detail-content">
-                <!-- INFORMAÇÕES BÁSICAS -->
-                <div class="detail-section">
-                    <div class="section-title">📝 Informações Básicas</div>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <div class="info-label">Espécie</div>
-                            <div class="info-value">${animal.especie}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Raça</div>
-                            <div class="info-value">${animal.raca}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Idade</div>
-                            <div class="info-value">${animal.idade} ${animal.idade == 1 ? 'ano' : 'anos'}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Status</div>
-                            <span class="badge" id="statusBadge" style="margin-top: 0;">● ${animal.status || 'Disponível'}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SAÚDE -->
-                <div class="detail-section">
-                    <div class="section-title">💉 Saúde</div>
-                    <div class="info-item">
-                        <div class="info-label">Estado de Saúde</div>
-                        <div class="info-value">${animal.saude || 'Sem informações'}</div>
-                    </div>
-                </div>
-
-                <!-- COMPORTAMENTO -->
-                <div class="detail-section">
-                    <div class="section-title">🎭 Comportamento</div>
-                    <div class="info-item">
-                        <div class="info-label">Descrição</div>
-                        <div class="info-value" style="line-height: 1.6;">
-                            ${animal.comportamento || 'Sem informações'}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PRÓXIMAS TAREFAS E VACINAÇÕES -->
-                <div class="detail-section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <div class="section-title" style="margin: 0;">📋 Próximas Tarefas e Vacinações</div>
-                        <button class="btn-add-task-icon" onclick="abrirModalTarefaComAnimal(${animal.id}, '${animal.nome}')">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none">
-                                <path d="M12.5 0C5.6 0 0 5.6 0 12.5C0 19.4 5.6 25 12.5 25C19.4 25 25 19.4 25 12.5C25 5.6 19.4 0 12.5 0ZM17.5 13.75H13.75V17.5C13.75 18.1875 13.1875 18.75 12.5 18.75C11.8125 18.75 11.25 18.1875 11.25 17.5V13.75H7.5C6.8125 13.75 6.25 13.1875 6.25 12.5C6.25 11.8125 6.8125 11.25 7.5 11.25H11.25V7.5C11.25 6.8125 11.8125 6.25 12.5 6.25C13.1875 6.25 13.75 6.8125 13.75 7.5V11.25H17.5C18.1875 11.25 18.75 11.8125 18.75 12.5C18.75 13.1875 18.1875 13.75 17.5 13.75Z" fill="#707FDD"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <div id="proximasTarefasDetailPanel" style="min-height: 150px;">
-                        <div style="text-align: center; padding: 30px 20px; color: #999;">
-                            <div style="font-size: 20px; margin-bottom: 8px;">⏳</div>
-                            <div style="font-size: 13px;">Carregando tarefas...</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Aplicar classe de estilo ao status
-        const statusBadge = document.getElementById('statusBadge');
-        if (statusBadge) {
-            statusBadge.classList.remove('badge-available', 'badge-process', 'badge-treatment');
-            if (animal.status === 'Em Processo') {
-                statusBadge.classList.add('badge-process');
-            } else if (animal.status === 'Em Tratamento') {
-                statusBadge.classList.add('badge-treatment');
-            } else {
-                statusBadge.classList.add('badge-available');
-            }
+        // Usar componente consolidado para renderizar detalhes no painel lateral
+        if (typeof AnimalDetailPanel !== 'undefined') {
+            AnimalDetailPanel.render(animal, 'detailPanel', { showEdit: true });
+        } else {
+            console.error('AnimalDetailPanel não carregado');
         }
-
-        // Carregar próximas tarefas do animal
-        carregarProximasTarefasDetail(animalId);
 
     } catch (error) {
         console.error('Erro ao carregar detalhes:', error);
@@ -247,65 +161,12 @@ async function carregarDetalhesAnimal(animalId) {
     }
 }
 
-/**
- * Carrega próximas tarefas do animal no detail panel
- * Usa constante TAREFA_ICON_MAP compartilhada
- * @param {number} animalId - ID do animal
- */
+// Funcao carregarProximasTarefasDetail movida para AnimalDetailPanel.renderTarefas()
+// Mantida para compatibilidade caso seja chamada de outro lugar
 function carregarProximasTarefasDetail(animalId) {
-    const container = document.getElementById('proximasTarefasDetailPanel');
-    if (!container) return;
-
-    fetch(`/api/proximas-tarefas?animal_id=${animalId}`)
-        .then(response => response.json())
-        .then(tarefas => {
-            if (tarefas.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 20px; color: #999;">
-                        <div style="font-size: 20px; margin-bottom: 8px;">✓</div>
-                        <div style="font-size: 13px;">Nenhuma tarefa cadastrada</div>
-                    </div>
-                `;
-            } else {
-                let html = '';
-                tarefas.forEach(tarefa => {
-                    // Usar constante compartilhada ao invés de duplicar iconMap
-                    const icon = obterIconeTarefa(tarefa.tarefa);
-                    const urgentClass = tarefa.contagem.urgente ? 'style="background: #fff3cd; border-left-color: #ffc107;"' : '';
-
-                    let badgeStyle = 'background: #d1ecf1; color: #0c5460;';
-                    if (tarefa.contagem.status === 'urgente' || tarefa.contagem.status === 'atrasado' || tarefa.contagem.status === 'hoje') {
-                        badgeStyle = 'background: #f8d7da; color: #721c24;';
-                    } else if (tarefa.contagem.status === 'proximo') {
-                        badgeStyle = 'background: #d4edda; color: #155724;';
-                    }
-
-                    html += `
-                        <div style="display: flex; align-items: center; gap: 12px; padding: 10px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid #27ae60; margin-bottom: 8px;" ${urgentClass}>
-                            <div style="font-size: 24px; min-width: 30px; text-align: center;">${icon}</div>
-                            <div style="flex: 1; min-width: 0;">
-                                <div style="font-weight: 600; color: #2c3e50; font-size: 14px;">${tarefa.tarefa}</div>
-                                <div style="font-size: 12px; color: #7f8c8d; margin-top: 2px;">Responsável: ${tarefa.responsavel}</div>
-                            </div>
-                            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; min-width: 120px;">
-                                <span style="display: inline-block; padding: 3px 6px; border-radius: 10px; font-size: 11px; font-weight: 600; white-space: nowrap; ${badgeStyle}">${tarefa.contagem.mensagem}</span>
-                                <span style="font-size: 11px; color: #7f8c8d;">${tarefa.data}</span>
-                            </div>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
-            }
-        })
-        .catch(error => {
-            console.error('Erro ao carregar tarefas:', error);
-            container.innerHTML = `
-                <div style="text-align: center; padding: 20px; color: #999;">
-                    <div style="font-size: 20px; margin-bottom: 8px;">⚠️</div>
-                    <div style="font-size: 13px;">Erro ao carregar tarefas</div>
-                </div>
-            `;
-        });
+    if (typeof AnimalDetailPanel !== 'undefined') {
+        AnimalDetailPanel.renderTarefas(animalId, 'detailPanel', false);
+    }
 }
 
 /**
@@ -332,9 +193,16 @@ async function editarAnimal(animalId) {
         document.getElementById('editRaca').value = animal.raca;
         document.getElementById('editIdade').value = animal.idade;
         document.getElementById('editSaude').value = animal.saude || '';
-        document.getElementById('editComportamento').value = animal.comportamento || '';
         document.getElementById('editData').value = animal.data;
         document.getElementById('editStatus').value = animal.status || 'Disponível';
+
+        // Renderizar sliders com dados atuais
+        const personalidadeDiv = document.getElementById('personalidadeEditAnimal');
+        if (personalidadeDiv) {
+            const personalidade = parsePersonalidade(animal.comportamento);
+            personalidadeDiv.innerHTML = renderizarTodosSliders(personalidade);
+            inicializarSlidersListener();
+        }
 
         // Abrir o modal
         openModal('editAnimalModal');
@@ -347,13 +215,17 @@ async function editarAnimal(animalId) {
                 const submitButton = this.querySelector('button[type="submit"]');
                 setButtonLoading(submitButton, true);
 
+                // Extrair valores dos sliders
+                const formData = new FormData(this);
+                const personalidade = extrairPersonalidade(formData);
+
                 const editData = {
                     nome: document.getElementById('editNome').value,
                     especie: document.getElementById('editEspecie').value,
                     raca: document.getElementById('editRaca').value,
                     idade: parseInt(document.getElementById('editIdade').value),
                     saude: document.getElementById('editSaude').value,
-                    comportamento: document.getElementById('editComportamento').value,
+                    comportamento: JSON.stringify(personalidade),
                     data: document.getElementById('editData').value,
                     status: document.getElementById('editStatus').value
                 };

@@ -444,3 +444,99 @@ select.form-control {
     font-size: var(--font-size-small);
     color: var(--text-light);
 }
+
+/* PERSONALITY TRAITS SLIDERS */
+.personality-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: var(--spacing-md);
+}
+
+.personality-slider-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 24px;
+}
+
+.slider-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    height: 100%;
+}
+
+.slider-label-left,
+.slider-label-right {
+    font-size: 11px;
+    color: var(--text-dark);
+    font-weight: 500;
+    width: 60px;
+    white-space: nowrap;
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.slider-label-left {
+    text-align: right;
+}
+
+.slider-label-right {
+    text-align: left;
+}
+
+.personality-slider {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(
+        to right,
+        rgba(90, 106, 207, 0.15) 0%,
+        rgba(90, 106, 207, 0.15) 50%,
+        rgba(247, 127, 149, 0.15) 50%,
+        rgba(247, 127, 149, 0.15) 100%
+    );
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+.personality-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(90, 106, 207, 0.4);
+    transition: all 0.2s ease;
+}
+
+.personality-slider::-webkit-slider-thumb:hover {
+    width: 16px;
+    height: 16px;
+    box-shadow: 0 2px 6px rgba(90, 106, 207, 0.5);
+}
+
+.personality-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 1px 3px rgba(90, 106, 207, 0.4);
+    transition: all 0.2s ease;
+}
+
+.personality-slider::-moz-range-thumb:hover {
+    width: 16px;
+    height: 16px;
+    box-shadow: 0 2px 6px rgba(90, 106, 207, 0.5);
+}
